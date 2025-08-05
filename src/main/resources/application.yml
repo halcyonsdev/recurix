@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: recurix-bot
+
+  r2dbc:
+    url: ${LOCAL_POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+  flyway:
+    url: ${FLYWAY_URL}
+    user: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+
+telegram:
+  bot:
+    username: ${BOT_USERNAME}
+    token: ${BOT_TOKEN}
+    webhook-url: ${BOT_WEBHOOK_URL}

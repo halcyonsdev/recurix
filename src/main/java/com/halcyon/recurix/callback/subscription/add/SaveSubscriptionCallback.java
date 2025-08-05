@@ -1,0 +1,110 @@
+package com.halcyon.recurix.callback.subscription.add;
+
+import com.halcyon.recurix.callback.Callback;
+import com.halcyon.recurix.callback.CallbackData;
+import com.halcyon.recurix.client.TelegramApiClient;
+import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import com.halcyon.recurix.model.Subscription;
+import com.halcyon.recurix.model.User;
+import com.halcyon.recurix.service.*;
+import com.halcyon.recurix.support.SubscriptionContext;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
+
+import java.io.Serializable;
+
+/**
+ * Обработчик callback-запроса для сохранения новой подписки.
+ * <p>
+ * Срабатывает при нажатии на кнопку "Сохранить" на экране подтверждения.
+ * Завершает диалог, сохраняет данные в базу, очищает состояние и
+ * отображает обновленный список всех подписок.
+ */
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class SaveSubscriptionCallback implements Callback {
+
+    private final ConversationStateService stateService;
+    private final LocalMessageService messageService;
+    private final UserService userService;
+    private final SubscriptionService subscriptionService;
+    private final TelegramApiClient telegramApiClient;
+    private final SubscriptionMessageFactory subscriptionMessageFactory;
+
+    @Override
+    public boolean supports(String callbackData) {
+        return CallbackData.SUBSCRIPTION_SAVE.equals(callbackData);
+    }
+
+    /**
+     * Запускает процесс сохранения подписки и отображения результата.
+     * <p>
+     * Метод выполняет следующие действия:
+     * <ol>
+     *     <li>Отправляет пользователю всплывающее уведомление об успешном сохранении.</li>
+     *     <li>Вызывает приватный метод для извлечения данных из контекста и сохранения их в БД.</li>
+     *     <li>Полностью завершает диалог, очищая состояние и контекст в Redis.</li>
+     *     <li>Загружает и отображает обновленный список всех подписок пользователя.</li>
+     * </ol>
+     *
+     * @param update Входящее обновление от Telegram с {@link CallbackQuery}.
+     * @return {@code Mono}, содержащий {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText} с финальным списком подписок.
+     */
+    @Override
+    public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
+        CallbackQuery callbackQuery = update.getCallbackQuery();
+        var telegramUser = callbackQuery.getFrom();
+        Long chatId = callbackQuery.getMessage().getChatId();
+        Integer messageId = callbackQuery.getMessage().getMessageId();
+
+        log.info("User {} initiated saving a subscription.", telegramUser.getId());
+
+        return telegramApiClient.sendAnswerCallbackQuery(
+                callbackQuery.getId(),
+                messageService.getMessage("add.success")
+        ).then(saveSubscriptionFromContext(telegramUser))
+                .flatMap(savedSubscription -> stateService.endConversation(telegramUser.getId())
+                        .then(subscriptionService.getAllByUserId(savedSubscription.getUserId()).collectList())
+                )
+                .map(allSubscriptions ->
+                        subscriptionMessageFactory.createSubscriptionsListMessage(chatId, messageId, allSubscriptions)
+                );
+    }
+
+    /**
+     * Извлекает данные из контекста диалога, связывает их с пользователем и сохраняет новую подписку в базе данных.
+     *
+     * @param telegramUser пользователь Telegram, для которого сохраняется подписка.
+     * @return {@code Mono}, содержащий сохраненный объект {@link Subscription}, или {@code Mono.empty()}, если контекст не найден.
+     */
+    private Mono<Subscription> saveSubscriptionFromContext(org.telegram.telegrambots.meta.api.objects.User telegramUser) {
+        Mono<User> userMono = userService.findOrCreateUser(telegramUser);
+        Mono<SubscriptionContext> contextMono = stateService.getContext(telegramUser.getId(), SubscriptionContext.class);
+
+        return Mono.zip(contextMono, userMono)
+                .flatMap(this::persistSubscription);
+    }
+
+    /**
+     * Устанавливает ID пользователя для подписки и сохраняет ее в репозиторий.
+     *
+     * @param tuple Кортеж, содержащий {@link SubscriptionContext} и {@link User}.
+     * @return {@code Mono} с сохраненной подпиской.
+     */
+    private Mono<Subscription> persistSubscription(Tuple2<SubscriptionContext, User> tuple) {
+        Subscription subscriptionToSave = tuple.getT1().getSubscription();
+        User owner = tuple.getT2();
+
+        subscriptionToSave.setUserId(owner.id());
+
+        log.info("Saving subscription '{}' for user {}", subscriptionToSave.getName(), owner.id());
+        return subscriptionService.save(subscriptionToSave);
+    }
+}

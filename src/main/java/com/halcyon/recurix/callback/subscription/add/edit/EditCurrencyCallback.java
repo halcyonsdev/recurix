@@ -1,0 +1,52 @@
+package com.halcyon.recurix.callback.subscription.add.edit;
+
+import com.halcyon.recurix.callback.CallbackData;
+import com.halcyon.recurix.service.ConversationStateService;
+import com.halcyon.recurix.service.KeyboardService;
+import com.halcyon.recurix.service.LocalMessageService;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import reactor.core.publisher.Mono;
+
+import java.io.Serializable;
+
+/**
+ * Обрабатывает нажатие на кнопку "Изменить валюту" в меню редактирования.
+ * <p>
+ * Этот класс не устанавливает состояние ожидания текстового ввода.
+ * Вместо этого он отправляет пользователю сообщение с инлайн-клавиатурой для выбора одной из доступных валют.
+ *
+ * @see BaseEditCallback
+ * @see ChooseCurrencyCallback
+ */
+@Component
+public class EditCurrencyCallback extends BaseEditCallback {
+
+    public EditCurrencyCallback(ConversationStateService stateService, LocalMessageService messageService, KeyboardService keyboardService) {
+        super(stateService, messageService, keyboardService);
+    }
+
+    @Override
+    public boolean supports(String callbackData) {
+        return CallbackData.EDIT_CURRENCY.equals(callbackData);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Вызывает общую логику из {@link BaseEditCallback#sendEditRequestWithCustomKeyboard},
+     * чтобы отправить пользователю сообщение с инлайн-клавиатурой для выбора валюты.
+     *
+     * @param update объект с данными от Telegram.
+     * @return {@code Mono} с готовым {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText} для отправки пользователю.
+     */
+    @Override
+    public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
+        return sendEditRequestWithCustomKeyboard(
+                update,
+                "dialog.add.edit.currency",
+                keyboardService.getCurrencySelectionKeyboard()
+        );
+    }
+}
