@@ -25,7 +25,7 @@ public class InputParser {
     /**
      * Парсит и валидирует строку для получения цены.
      * @param text Входной текст от пользователя.
-     * @return Объект BigDecimal.
+     * @return цена BigDecimal.
      * @throws InvalidPriceException если текст имеет неверный числовой формат.
      * @throws NegativePriceException если цена является отрицательным числом.
      */
@@ -48,7 +48,7 @@ public class InputParser {
     /**
      * Парсит и валидирует строку для получения даты.
      * @param text Входной текст от пользователя.
-     * @return Объект LocalDate.
+     * @return дата LocalDate.
      * @throws InvalidDateException если текст имеет неверный формат даты.
      * @throws DateInPastException если дата находится в прошлом.
      */

@@ -5,7 +5,7 @@ import com.halcyon.recurix.callback.CallbackData;
 import com.halcyon.recurix.client.TelegramApiClient;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
 import com.halcyon.recurix.model.Subscription;
-import com.halcyon.recurix.model.User;
+import com.halcyon.recurix.model.RecurixUser;
 import com.halcyon.recurix.service.*;
 import com.halcyon.recurix.support.SubscriptionContext;
 import lombok.RequiredArgsConstructor;
@@ -85,7 +85,7 @@ public class SaveSubscriptionCallback implements Callback {
      * @return {@code Mono}, содержащий сохраненный объект {@link Subscription}, или {@code Mono.empty()}, если контекст не найден.
      */
     private Mono<Subscription> saveSubscriptionFromContext(org.telegram.telegrambots.meta.api.objects.User telegramUser) {
-        Mono<User> userMono = userService.findOrCreateUser(telegramUser);
+        Mono<RecurixUser> userMono = userService.findOrCreateUser(telegramUser);
         Mono<SubscriptionContext> contextMono = stateService.getContext(telegramUser.getId(), SubscriptionContext.class);
 
         return Mono.zip(contextMono, userMono)
@@ -95,12 +95,12 @@ public class SaveSubscriptionCallback implements Callback {
     /**
      * Устанавливает ID пользователя для подписки и сохраняет ее в репозиторий.
      *
-     * @param tuple Кортеж, содержащий {@link SubscriptionContext} и {@link User}.
+     * @param tuple Кортеж, содержащий {@link SubscriptionContext} и {@link RecurixUser}.
      * @return {@code Mono} с сохраненной подпиской.
      */
-    private Mono<Subscription> persistSubscription(Tuple2<SubscriptionContext, User> tuple) {
+    private Mono<Subscription> persistSubscription(Tuple2<SubscriptionContext, RecurixUser> tuple) {
         Subscription subscriptionToSave = tuple.getT1().getSubscription();
-        User owner = tuple.getT2();
+        RecurixUser owner = tuple.getT2();
 
         subscriptionToSave.setUserId(owner.id());
 
