@@ -23,7 +23,6 @@ public class RecurixBot extends SpringWebhookBot {
 
     public RecurixBot(SetWebhook setWebhook, String botToken, UpdateHandlerService updateHandlerService) {
         super(setWebhook, botToken);
-        System.out.println(setWebhook.getUrl());
         this.updateHandlerService = updateHandlerService;
     }
 

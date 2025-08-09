@@ -23,6 +23,13 @@ public final class CallbackData {
     public static final String EDIT_CATEGORY = "category_edit";
     public static final String BACK_TO_CONFIRMATION = "back_to_confirmation";
 
-    public static final String BACK_TO_EDIT = "back_to_edit";
+    public static final String BACK_TO_EDIT = "back-to-edit";
     public static final String CURRENCY_SELECT_PREFIX = "sub_currency_";
+
+    public static final String CALENDAR_NAV_PREFIX = "cal_nav_";
+    public static final String CALENDAR_SELECT_PREFIX = "cal_date_";
+    public static final String CALENDAR_QUICK_PREFIX = "cal_quick_";
+    public static final String CALENDAR_APPLY_PREFIX = "cal_apply_";
+    public static final String CALENDAR_NOTIFY_PREFIX = "cal_notify_";
+    public static final String CALENDAR_IGNORE = "cal_ignore";
 }

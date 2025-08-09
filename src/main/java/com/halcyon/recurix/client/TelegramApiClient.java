@@ -40,10 +40,21 @@ public class TelegramApiClient {
      * @return Mono<Void>, который завершается, когда запрос отправлен.
      */
     public Mono<Void> sendAnswerCallbackQuery(String callbackQueryId, String text) {
+        return sendAnswerCallbackQuery(callbackQueryId, text, false);
+    }
+
+    /**
+     * Асинхронно отправляет всплывающее уведомление в ответ на нажатие инлайн-кнопки.
+     * @param callbackQueryId Уникальный ID из объекта CallbackQuery.
+     * @param text Текст уведомления (до 200 символов).
+     * @param showAlert Если true, уведомление будет показано как алерт.
+     * @return Mono<Void>, который завершается, когда запрос отправлен.
+     */
+    public Mono<Void> sendAnswerCallbackQuery(String callbackQueryId, String text, boolean showAlert) {
         var answer = AnswerCallbackQuery.builder()
                 .callbackQueryId(callbackQueryId)
                 .text(text)
-                .showAlert(false)
+                .showAlert(showAlert)
                 .build();
 
         return webClient.post()
@@ -51,6 +62,7 @@ public class TelegramApiClient {
                 .bodyValue(answer)
                 .retrieve()
                 .bodyToMono(Void.class)
-                .onErrorComplete(e -> true);
+                .doOnError(e -> log.error("Failed to send answer callback query [{}]: {}", callbackQueryId, e.getMessage()))
+                .onErrorComplete();
     }
 }

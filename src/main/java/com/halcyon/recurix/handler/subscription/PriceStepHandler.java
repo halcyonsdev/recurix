@@ -1,11 +1,12 @@
 package com.halcyon.recurix.handler.subscription;
 
+import com.halcyon.recurix.callback.CallbackData;
 import com.halcyon.recurix.exception.InvalidInputException;
+import com.halcyon.recurix.handler.ConversationState;
 import com.halcyon.recurix.handler.ConversationStepHandler;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
-import com.halcyon.recurix.handler.ConversationState;
 import com.halcyon.recurix.support.InputParser;
 import com.halcyon.recurix.support.SubscriptionContext;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.YearMonth;
 
 /**
  * Обрабатывает ввод цены подписки на втором шаге диалога при создании подписки.
@@ -92,7 +94,7 @@ public class PriceStepHandler implements ConversationStepHandler {
         return Mono.fromCallable(() -> SendMessage.builder()
                 .chatId(userId.toString())
                 .text(messageService.getMessage("dialog.add.prompt.date"))
-                .replyMarkup(keyboardService.getBackToMenuKeyboard())
+                .replyMarkup(keyboardService.getCalendarKeyboard(YearMonth.now(), CallbackData.MENU))
                 .build());
     }
 }

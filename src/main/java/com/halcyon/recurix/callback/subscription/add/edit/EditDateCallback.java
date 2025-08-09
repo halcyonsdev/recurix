@@ -1,16 +1,17 @@
 package com.halcyon.recurix.callback.subscription.add.edit;
 
 import com.halcyon.recurix.callback.CallbackData;
+import com.halcyon.recurix.handler.ConversationState;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
-import com.halcyon.recurix.handler.ConversationState;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
+import java.time.YearMonth;
 
 /**
  * Обработчик callback-запроса для начала редактирования даты следующего платежа.
@@ -48,6 +49,10 @@ public class EditDateCallback extends BaseEditCallback {
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
-        return sendEditMessage(update, "dialog.add.edit.date", ConversationState.AWAITING_NEW_DATE);
+        return sendEditRequestWithCustomKeyboard(
+                update,
+                "dialog.add.prompt.date",
+                keyboardService.getCalendarKeyboard(YearMonth.now(), CallbackData.BACK_TO_EDIT)
+        );
     }
 }
