@@ -31,5 +31,10 @@ public final class CallbackData {
     public static final String CALENDAR_QUICK_PREFIX = "cal_quick_";
     public static final String CALENDAR_APPLY_PREFIX = "cal_apply_";
     public static final String CALENDAR_NOTIFY_PREFIX = "cal_notify_";
-    public static final String CALENDAR_IGNORE = "cal_ignore";
+
+    public static final String IGNORE = "ignore";
+
+    public static final String SUB_LIST_PAGE_PREFIX = "sub_list_page_";
+    public static final String SUB_VIEW_PREFIX = "sub_view_";
+    public static final String SUB_SORT_PREFIX = "sub_sort_";
 }

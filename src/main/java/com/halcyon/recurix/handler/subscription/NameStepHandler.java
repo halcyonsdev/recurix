@@ -1,11 +1,11 @@
 package com.halcyon.recurix.handler.subscription;
 
+import com.halcyon.recurix.handler.ConversationState;
 import com.halcyon.recurix.handler.ConversationStepHandler;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
-import com.halcyon.recurix.handler.ConversationState;
-import com.halcyon.recurix.support.SubscriptionContext;
+import com.halcyon.recurix.service.context.SubscriptionContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;

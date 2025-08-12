@@ -1,4 +1,4 @@
-package com.halcyon.recurix.support;
+package com.halcyon.recurix.service.context;
 
 import com.halcyon.recurix.model.Subscription;
 import lombok.AllArgsConstructor;

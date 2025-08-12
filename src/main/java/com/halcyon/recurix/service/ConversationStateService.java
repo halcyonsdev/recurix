@@ -2,6 +2,7 @@ package com.halcyon.recurix.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.halcyon.recurix.handler.ConversationState;
+import com.halcyon.recurix.service.context.SubscriptionListContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
@@ -69,6 +70,26 @@ public class ConversationStateService {
     }
 
     public Mono<Void> endConversation(Long userId) {
-        return clearState(userId).then(clearContext(userId));
+        return clearState(userId)
+                .then(clearContext(userId))
+                .then(clearListContext(userId));
+    }
+
+    public Mono<Void> setListContext(Long userId, SubscriptionListContext context) {
+        return redisTemplate.opsForValue()
+                .set(listContextKey(userId), context, STATE_TTL)
+                .then();
+    }
+
+    private String listContextKey(Long userId) {
+        return "list_context:" + userId;
+    }
+
+    public Mono<SubscriptionListContext> getListContext(Long userId) {
+        return fetch(listContextKey(userId), SubscriptionListContext.class);
+    }
+
+    public Mono<Void> clearListContext(Long userId) {
+        return redisTemplate.delete(listContextKey(userId)).then();
     }
 }

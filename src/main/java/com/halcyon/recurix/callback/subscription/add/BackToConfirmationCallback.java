@@ -2,10 +2,10 @@ package com.halcyon.recurix.callback.subscription.add;
 
 import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
-import com.halcyon.recurix.support.SubscriptionMessageFactory;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
-import com.halcyon.recurix.support.SubscriptionContext;
+import com.halcyon.recurix.service.context.SubscriptionContext;
+import com.halcyon.recurix.support.SubscriptionMessageFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;

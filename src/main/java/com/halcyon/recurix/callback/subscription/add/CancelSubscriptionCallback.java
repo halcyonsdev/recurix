@@ -3,13 +3,17 @@ package com.halcyon.recurix.callback.subscription.add;
 import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
 import com.halcyon.recurix.client.TelegramApiClient;
-import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import com.halcyon.recurix.model.RecurixUser;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.service.SubscriptionService;
 import com.halcyon.recurix.service.UserService;
+import com.halcyon.recurix.service.pagination.PaginationConstants;
+import com.halcyon.recurix.support.SubscriptionMessageFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -50,31 +54,34 @@ public class CancelSubscriptionCallback implements Callback {
      *     <li>Отправляет пользователю всплывающее уведомление о том, что операция отменена.</li>
      *     <li>Полностью очищает состояние и контекст диалога пользователя в Redis.</li>
      *     <li>Загружает актуальный список всех подписок пользователя.</li>
-     *     <li>Отображает этот список, редактируя исходное сообщение.</li>
+     *     <li>Удаляет прошлое сообщение и отправляет первую страницу списка подписок.</li>
      * </ol>
      *
      * @param update Объект, содержащий callback-запрос от пользователя.
-     * @return {@code Mono} с объектом {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText} для обновления сообщения.
+     * @return {@code Mono} с объектом {@link org.telegram.telegrambots.meta.api.methods.send.SendMessage} со списком подписок.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
         CallbackQuery callbackQuery = update.getCallbackQuery();
         User telegramUser = callbackQuery.getFrom();
-        Long userId = telegramUser.getId();
+        Long chatId = callbackQuery.getMessage().getChatId();
         Integer messageId = callbackQuery.getMessage().getMessageId();
 
-        log.info("User {} cancelled the subscription creation process.", userId);
+        log.info("User {} cancelled the subscription creation process.", telegramUser.getId());
+
+        Mono<RecurixUser> userMono = stateService.endConversation(chatId)
+                .then(userService.findOrCreateUser(telegramUser));
 
         return telegramApiClient.sendAnswerCallbackQuery(
                         callbackQuery.getId(),
                         messageService.getMessage("dialog.confirm.cancelled")
                 )
-                .then(stateService.endConversation(userId))
-                .then(userService.findOrCreateUser(telegramUser)
-                        .flatMap(user -> subscriptionService.getAllByUserId(user.id()).collectList())
-                )
-                .map(allSubscriptions ->
-                        subscriptionMessageFactory.createSubscriptionsListMessage(userId, messageId, allSubscriptions));
+                .then(telegramApiClient.deleteMessage(chatId, messageId))
+                .then(userMono.flatMap(user -> {
+                    Pageable pageable = PageRequest.of(0, PaginationConstants.DEFAULT_PAGE_SIZE, PaginationConstants.DEFAULT_SORT);
+                    return subscriptionService.getSubscriptionsAsPage(user.id(), pageable);
+                }))
+                .map(page -> subscriptionMessageFactory.createNewSubscriptionsPageMessage(chatId, messageId, page));
     }
 
 }

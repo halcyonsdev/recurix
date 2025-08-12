@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RecutixBotApplication {
+public class RecurixBotApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(RecutixBotApplication.class, args);
+        SpringApplication.run(RecurixBotApplication.class, args);
     }
 }

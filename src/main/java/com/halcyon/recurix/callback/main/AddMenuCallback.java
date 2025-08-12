@@ -2,12 +2,12 @@ package com.halcyon.recurix.callback.main;
 
 import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
+import com.halcyon.recurix.handler.ConversationState;
 import com.halcyon.recurix.model.Subscription;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
-import com.halcyon.recurix.handler.ConversationState;
-import com.halcyon.recurix.support.SubscriptionContext;
+import com.halcyon.recurix.service.context.SubscriptionContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,10 @@
 package com.halcyon.recurix.service;
 
+import com.halcyon.recurix.model.Subscription;
+import com.halcyon.recurix.service.context.SubscriptionListContext;
+import com.halcyon.recurix.service.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -25,10 +29,7 @@ public class KeyboardService {
     private final LocalMessageService messageService;
 
     public InlineKeyboardMarkup getMainMenuKeyboard() {
-        var addButton = InlineKeyboardButton.builder()
-                .text(messageService.getMessage("menu.button.add"))
-                .callbackData(MENU_ADD_SUBSCRIPTION)
-                .build();
+        var addButton = getAddButton();
 
         var subscriptionsButton = InlineKeyboardButton.builder()
                 .text(messageService.getMessage("menu.button.list"))
@@ -53,14 +54,10 @@ public class KeyboardService {
                 .build();
     }
 
-    public InlineKeyboardMarkup getSubscriptionsKeyboard() {
-        var menuButton = InlineKeyboardButton.builder()
-                .text(messageService.getMessage("menu.button"))
-                .callbackData(MENU)
-                .build();
-
-        return InlineKeyboardMarkup.builder()
-                .keyboardRow(List.of(menuButton))
+    private InlineKeyboardButton getAddButton() {
+        return InlineKeyboardButton.builder()
+                .text(messageService.getMessage("menu.button.add"))
+                .callbackData(MENU_ADD_SUBSCRIPTION)
                 .build();
     }
 
@@ -220,7 +217,7 @@ public class KeyboardService {
 
         return List.of(
                 InlineKeyboardButton.builder().text("←").callbackData(CALENDAR_NAV_PREFIX + prevMonth + "_" + selectedDateStr + "_" + backCallbackData).build(),
-                InlineKeyboardButton.builder().text(String.format("%s, %d", monthName, yearMonth.getYear())).callbackData(CALENDAR_IGNORE).build(),
+                InlineKeyboardButton.builder().text(String.format("%s, %d", monthName, yearMonth.getYear())).callbackData(IGNORE).build(),
                 InlineKeyboardButton.builder().text("→").callbackData(CALENDAR_NAV_PREFIX + nextMonth + "_" + selectedDateStr + "_" + backCallbackData).build()
         );
     }
@@ -230,13 +227,13 @@ public class KeyboardService {
      */
     private List<InlineKeyboardButton> createWeekdaysRow() {
         return List.of(
-                InlineKeyboardButton.builder().text("Пн").callbackData(CALENDAR_IGNORE).build(),
-                InlineKeyboardButton.builder().text("Вт").callbackData(CALENDAR_IGNORE).build(),
-                InlineKeyboardButton.builder().text("Ср").callbackData(CALENDAR_IGNORE).build(),
-                InlineKeyboardButton.builder().text("Чт").callbackData(CALENDAR_IGNORE).build(),
-                InlineKeyboardButton.builder().text("Пт").callbackData(CALENDAR_IGNORE).build(),
-                InlineKeyboardButton.builder().text("Сб").callbackData(CALENDAR_IGNORE).build(),
-                InlineKeyboardButton.builder().text("Вс").callbackData(CALENDAR_IGNORE).build()
+                InlineKeyboardButton.builder().text("Пн").callbackData(IGNORE).build(),
+                InlineKeyboardButton.builder().text("Вт").callbackData(IGNORE).build(),
+                InlineKeyboardButton.builder().text("Ср").callbackData(IGNORE).build(),
+                InlineKeyboardButton.builder().text("Чт").callbackData(IGNORE).build(),
+                InlineKeyboardButton.builder().text("Пт").callbackData(IGNORE).build(),
+                InlineKeyboardButton.builder().text("Сб").callbackData(IGNORE).build(),
+                InlineKeyboardButton.builder().text("Вс").callbackData(IGNORE).build()
         );
     }
 
@@ -253,7 +250,7 @@ public class KeyboardService {
             List<InlineKeyboardButton> row = new ArrayList<>();
             for (int j = 1; j <= 7; j++) {
                 if ((i == 0 && j < firstDayOfWeek) || currentDay > daysInMonth) {
-                    row.add(InlineKeyboardButton.builder().text(" ").callbackData(CALENDAR_IGNORE).build());
+                    row.add(InlineKeyboardButton.builder().text(" ").callbackData(IGNORE).build());
                 } else {
                     row.add(createDayButton(currentDay, yearMonth, selectedDate, backCallbackData));
                     currentDay++;
@@ -316,5 +313,111 @@ public class KeyboardService {
                 .build();
 
         return List.of(backButton, applyButton.build());
+    }
+
+    /**
+     * Создает клавиатуру для страницы списка подписок с кнопками пагинации.
+     * @param page Объект страницы.
+     * @return Инлайн-клавиатура.
+     */
+    public InlineKeyboardMarkup getSubscriptionsPageKeyboard(Page<Subscription> page, SubscriptionListContext context) {
+        var keyboardBuilder = InlineKeyboardMarkup.builder();
+
+        if (page.totalPages() > 1) {
+            keyboardBuilder.keyboardRow(createNavigationRow(page));
+        }
+
+        keyboardBuilder.keyboardRow(createSortingRow(page.currentPage(), context));
+        addKeyboardActionRows(keyboardBuilder);
+
+        return keyboardBuilder.build();
+    }
+
+    /**
+     * Создает ряд кнопок для пагинации ("назад", "номер страницы", "вперед").
+     *
+     * @param page Объект страницы для получения информации о текущей странице и общем количестве страниц.
+     * @return Список {@link InlineKeyboardButton}, представляющий ряд пагинации.
+     */
+    private List<InlineKeyboardButton> createNavigationRow(Page<Subscription> page) {
+        int currentPage = page.currentPage();
+
+        var backButton = InlineKeyboardButton.builder()
+                .text("⬅️")
+                .callbackData(currentPage > 0 ? SUB_LIST_PAGE_PREFIX + (currentPage - 1) : IGNORE)
+                .build();
+
+        var pageIndicatorButton = InlineKeyboardButton.builder()
+                .text(String.format("%d / %d", currentPage + 1, page.totalPages()))
+                .callbackData(IGNORE)
+                .build();
+
+        var forwardButton = InlineKeyboardButton.builder()
+                .text("➡️")
+                .callbackData(currentPage < page.totalPages() - 1 ? SUB_LIST_PAGE_PREFIX + (currentPage + 1) : IGNORE)
+                .build();
+
+        return List.of(backButton, pageIndicatorButton, forwardButton);
+    }
+
+    /**
+     * Создает ряд кнопок для сортировки с динамическими индикаторами направления (⬆️/⬇️).
+     *
+     * @param currentPage Номер текущей страницы для формирования callback-данных.
+     * @param context     Текущий контекст сортировки, определяющий, какой индикатор отображать.
+     * @return Список {@link InlineKeyboardButton}, представляющий ряд сортировки.
+     */
+    private List<InlineKeyboardButton> createSortingRow(int currentPage, SubscriptionListContext context) {
+        String dateSortText = messageService.getMessage("button.sort_by_date") +
+                ("paymentDate".equals(context.sortField()) && context.sortDirection() == Sort.Direction.ASC ? " ⬇️" : " ⬆️");
+
+        String priceSortText = messageService.getMessage("button.sort_by_price") +
+                ("price".equals(context.sortField()) && context.sortDirection() == Sort.Direction.ASC ? " ⬇️" : " ⬆️");
+
+        var sortByDateButton = InlineKeyboardButton.builder()
+                .text(dateSortText)
+                .callbackData(SUB_SORT_PREFIX + "paymentDate_" + currentPage)
+                .build();
+
+        var sortByPriceButton = InlineKeyboardButton.builder()
+                .text(priceSortText)
+                .callbackData(SUB_SORT_PREFIX + "price_" + currentPage)
+                .build();
+
+        return List.of(sortByDateButton, sortByPriceButton);
+    }
+
+    /**
+     * Добавляет ряды с кнопками действий ("Добавить подписку", "Назад в меню") в сборщик клавиатуры.
+     *
+     * @param keyboardBuilder Сборщик {@link InlineKeyboardMarkup.InlineKeyboardMarkupBuilder}, в который добавляются ряды.
+     */
+    private void addKeyboardActionRows(InlineKeyboardMarkup.InlineKeyboardMarkupBuilder keyboardBuilder) {
+        keyboardBuilder.keyboardRow(List.of(getAddButton()));
+        keyboardBuilder.keyboardRow(List.of(getMenuButton()));
+    }
+
+    private InlineKeyboardButton getMenuButton() {
+        return InlineKeyboardButton.builder()
+                .text(messageService.getMessage("menu.button"))
+                .callbackData(MENU)
+                .build();
+    }
+
+    /**
+     * Создает клавиатуру для экрана детального просмотра подписки.
+     * @param subscriptionId ID просматриваемой подписки.
+     * @param pageNumber     Номер страницы, на которую нужно вернуться.
+     * @return Инлайн-клавиатура с кнопками действий.
+     */
+    public InlineKeyboardMarkup getSubscriptionDetailKeyboard(Long subscriptionId, int pageNumber) {
+        var backToListButton = InlineKeyboardButton.builder()
+                .text(messageService.getMessage("subscriptions.list.back"))
+                .callbackData(SUB_LIST_PAGE_PREFIX + pageNumber)
+                .build();
+
+        return InlineKeyboardMarkup.builder()
+                .keyboardRow(List.of(backToListButton))
+                .build();
     }
 }

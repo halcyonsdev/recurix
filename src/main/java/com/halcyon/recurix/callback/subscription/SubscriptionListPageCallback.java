@@ -1,4 +1,4 @@
-package com.halcyon.recurix.callback.main;
+package com.halcyon.recurix.callback.subscription;
 
 import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
@@ -19,63 +19,56 @@ import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
 
 /**
- * Обработчик callback-запроса для отображения списка подписок пользователя.
+ * Обрабатывает callback-запросы для навигации между страницами списка подписок.
  * <p>
- * Срабатывает при нажатии на кнопку "Мои подписки" в главном меню.
- * Загружает подписки из базы данных и форматирует их в виде сообщения.
+ * Этот класс отвечает за корректное отображение запрошенной страницы,
+ * сохраняя при этом текущие настройки сортировки, выбранные пользователем.
  */
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ListMenuCallback implements Callback {
+public class SubscriptionListPageCallback implements Callback {
 
     private final UserService userService;
     private final SubscriptionService subscriptionService;
-    private final KeyboardService keyboardService;
     private final SubscriptionMessageFactory subscriptionMessageFactory;
+    private final KeyboardService keyboardService;
 
     @Override
     public boolean supports(String callbackData) {
-        return CallbackData.MENU_SUBSCRIPTIONS.equals(callbackData);
+        return callbackData != null && callbackData.startsWith(CallbackData.SUB_LIST_PAGE_PREFIX);
     }
 
     /**
-     * Загружает и отображает список всех подписок пользователя.
+     * Загружает и отображает указанную страницу подписок пользователя.
      * <p>
-     * Метод выполняет следующие действия:
-     * <ol>
-     *     <li>Извлекает информацию о пользователе, чате и сообщении из объекта {@code Update}.</li>
-     *     <li>Находит или создает пользователя в базе данных.</li>
-     *     <li>Получает все подписки этого пользователя для первой страницы.</li>
-     *     <li>Использует {@link SubscriptionMessageFactory} для создания отформатированного сообщения со списком.</li>
-     * </ol>
+     * Метод получает текущие настройки сортировки пользователя из Redis,
+     * запрашивает соответствующую страницу данных и обновляет исходное
+     * сообщение новым контентом и клавиатурой пагинации.
      *
-     * @param update Объект, содержащий callback-запрос от пользователя.
-     * @return {@code Mono} с объектом {@link EditMessageText},
-     * который обновляет исходное сообщение, отображая список подписок.
+     * @param update Входящий объект Update, содержащий callback-запрос.
+     * @return {@code Mono} с объектом {@link EditMessageText} для обновления сообщения.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
         CallbackQuery callbackQuery = update.getCallbackQuery();
-        User telegramUser = callbackQuery.getFrom();
-        Long userId = telegramUser.getId();
         Integer messageId = callbackQuery.getMessage().getMessageId();
+        int pageNumber = Integer.parseInt(callbackQuery.getData().substring(CallbackData.SUB_LIST_PAGE_PREFIX.length()));
 
-        log.info("User {} requested their subscription list.", userId);
+        log.info("User {} requested subscription list page #{}", callbackQuery.getFrom().getId(), pageNumber);
 
-        Pageable pageable = PageRequest.of(0, PaginationConstants.DEFAULT_PAGE_SIZE, PaginationConstants.DEFAULT_SORT);
+        Pageable pageable = PageRequest.of(pageNumber, PaginationConstants.DEFAULT_PAGE_SIZE, PaginationConstants.DEFAULT_SORT);
         var defaultContext = new SubscriptionListContext("paymentDate", Sort.Direction.ASC);
 
-        return userService.findOrCreateUser(telegramUser)
+        return userService.findOrCreateUser(callbackQuery.getFrom())
                 .flatMap(user -> subscriptionService.getSubscriptionsAsPage(user.id(), pageable))
                 .map(page -> EditMessageText.builder()
-                        .chatId(userId)
+                        .chatId(callbackQuery.getMessage().getChatId())
                         .messageId(messageId)
                         .text(subscriptionMessageFactory.formatSubscriptionsPage(page, messageId))
                         .parseMode(ParseMode.HTML)

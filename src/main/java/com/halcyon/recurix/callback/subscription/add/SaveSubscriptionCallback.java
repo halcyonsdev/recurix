@@ -3,17 +3,24 @@ package com.halcyon.recurix.callback.subscription.add;
 import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
 import com.halcyon.recurix.client.TelegramApiClient;
-import com.halcyon.recurix.support.SubscriptionMessageFactory;
-import com.halcyon.recurix.model.Subscription;
 import com.halcyon.recurix.model.RecurixUser;
-import com.halcyon.recurix.service.*;
-import com.halcyon.recurix.support.SubscriptionContext;
+import com.halcyon.recurix.model.Subscription;
+import com.halcyon.recurix.service.ConversationStateService;
+import com.halcyon.recurix.service.LocalMessageService;
+import com.halcyon.recurix.service.SubscriptionService;
+import com.halcyon.recurix.service.UserService;
+import com.halcyon.recurix.service.context.SubscriptionContext;
+import com.halcyon.recurix.service.pagination.PaginationConstants;
+import com.halcyon.recurix.support.SubscriptionMessageFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
@@ -55,27 +62,28 @@ public class SaveSubscriptionCallback implements Callback {
      * </ol>
      *
      * @param update Входящее обновление от Telegram с {@link CallbackQuery}.
-     * @return {@code Mono}, содержащий {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText} с финальным списком подписок.
+     * @return {@code Mono}, содержащий {@link org.telegram.telegrambots.meta.api.methods.send.SendMessage} с первой страницей списка подписок.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
         CallbackQuery callbackQuery = update.getCallbackQuery();
-        var telegramUser = callbackQuery.getFrom();
+        User telegramUser = callbackQuery.getFrom();
         Long chatId = callbackQuery.getMessage().getChatId();
         Integer messageId = callbackQuery.getMessage().getMessageId();
 
         log.info("User {} initiated saving a subscription.", telegramUser.getId());
 
-        return telegramApiClient.sendAnswerCallbackQuery(
-                callbackQuery.getId(),
-                messageService.getMessage("add.success")
-        ).then(saveSubscriptionFromContext(telegramUser))
+        Mono<Long> userMono = saveSubscriptionFromContext(telegramUser)
                 .flatMap(savedSubscription -> stateService.endConversation(telegramUser.getId())
-                        .then(subscriptionService.getAllByUserId(savedSubscription.getUserId()).collectList())
-                )
-                .map(allSubscriptions ->
-                        subscriptionMessageFactory.createSubscriptionsListMessage(chatId, messageId, allSubscriptions)
-                );
+                        .thenReturn(savedSubscription.getUserId()));
+
+        return telegramApiClient.sendAnswerCallbackQuery(callbackQuery.getId(), messageService.getMessage("add.success"))
+                .then(telegramApiClient.deleteMessage(chatId, messageId))
+                .then(userMono.flatMap(userId -> {
+                    Pageable pageable = PageRequest.of(0, PaginationConstants.DEFAULT_PAGE_SIZE, PaginationConstants.DEFAULT_SORT);
+                    return subscriptionService.getSubscriptionsAsPage(userId, pageable);
+                }))
+                .map(page -> subscriptionMessageFactory.createNewSubscriptionsPageMessage(chatId, messageId, page));
     }
 
     /**

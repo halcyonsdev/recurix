@@ -1,14 +1,15 @@
 package com.halcyon.recurix.command;
 
-import com.halcyon.recurix.support.SubscriptionMessageFactory;
-import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.SubscriptionService;
 import com.halcyon.recurix.service.UserService;
+import com.halcyon.recurix.service.pagination.PaginationConstants;
+import com.halcyon.recurix.support.SubscriptionMessageFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -27,7 +28,6 @@ public class ListCommand implements BotCommand {
 
     private final UserService userService;
     private final SubscriptionService subscriptionService;
-    private final KeyboardService keyboardService;
     private final SubscriptionMessageFactory subscriptionMessageFactory;
 
     private static final String LIST_COMMAND = "/list";
@@ -40,30 +40,37 @@ public class ListCommand implements BotCommand {
     }
 
     /**
-     * Выполняет логику команды /list.
+     * Обработчик команды /list, отвечающий за отображение первой страницы списка подписок пользователя.
      * <p>
-     * Метод находит или создает пользователя в базе данных, запрашивает для него
-     * все сохраненные подписки, форматирует их в виде читаемого списка и отправляет
-     * пользователю в новом сообщении вместе с соответствующей клавиатурой.
+     * Метод выполняет следующие действия:
+     * <ol>
+     *     <li>Находит или создает пользователя в базе данных.</li>
+     *     <li>Формирует запрос ({@link org.springframework.data.domain.Pageable}) для получения первой страницы (страница 0)
+     *         с использованием стандартных настроек сортировки и размера страницы из {@link com.halcyon.recurix.service.pagination.PaginationConstants}.</li>
+     *     <li>Запрашивает у сервиса пагинированный список подписок.</li>
+     *     <li>С помощью {@link com.halcyon.recurix.support.SubscriptionMessageFactory} создает новое сообщение,
+     *         содержащее отформатированную страницу и клавиатуру для навигации.</li>
+     * </ol>
      *
      * @param update Объект с сообщением от пользователя.
-     * @return {@code Mono} с объектом {@link SendMessage}, содержащим список подписок.
+     * @return {@code Mono} с объектом {@link SendMessage}, содержащим первую страницу подписок и клавиатуру для пагинации.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
         User telegramUser = update.getMessage().getFrom();
-        Long chatId = update.getMessage().getChatId();
 
         log.info("User {} executed /list command.", telegramUser.getId());
 
         return userService.findOrCreateUser(telegramUser)
-                .flatMap(user -> subscriptionService.getAllByUserId(user.id()).collectList())
-                .map(subscriptions -> SendMessage.builder()
-                            .chatId(chatId)
-                            .text(subscriptionMessageFactory.formatSubscriptionList(subscriptions))
-                            .parseMode(ParseMode.MARKDOWN)
-                            .replyMarkup(keyboardService.getSubscriptionsKeyboard())
-                            .build());
+                .flatMap(user -> {
+                    Pageable pageable = PageRequest.of(0, PaginationConstants.DEFAULT_PAGE_SIZE, PaginationConstants.DEFAULT_SORT);
+                    return subscriptionService.getSubscriptionsAsPage(user.id(), pageable);
+                })
+                .map(page -> subscriptionMessageFactory.createNewSubscriptionsPageMessage(
+                        update.getMessage().getChatId(),
+                        update.getMessage().getMessageId(),
+                        page
+                ));
     }
 
 }

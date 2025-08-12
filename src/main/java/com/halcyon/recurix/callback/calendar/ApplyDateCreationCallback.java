@@ -6,7 +6,7 @@ import com.halcyon.recurix.handler.ConversationState;
 import com.halcyon.recurix.model.Subscription;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
-import com.halcyon.recurix.support.SubscriptionContext;
+import com.halcyon.recurix.service.context.SubscriptionContext;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
