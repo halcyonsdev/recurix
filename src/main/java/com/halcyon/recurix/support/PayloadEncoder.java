@@ -1,8 +1,7 @@
 package com.halcyon.recurix.support;
 
-import org.springframework.stereotype.Component;
-
 import java.util.Base64;
+import org.springframework.stereotype.Component;
 
 /**
  * Утилитарный компонент для кодирования и декодирования параметров,
@@ -13,9 +12,10 @@ public class PayloadEncoder {
 
     /**
      * Простая запись для хранения декодированных данных.
+     * 
      * @param subscriptionId ID подписки.
-     * @param pageNumber Номер страницы.
-     * @param messageId ID сообщения для редактирования или удаления.
+     * @param pageNumber     Номер страницы.
+     * @param messageId      ID сообщения для редактирования или удаления.
      */
     public record Payload(Long subscriptionId, int pageNumber, Integer messageId) {}
 
@@ -25,8 +25,8 @@ public class PayloadEncoder {
      * Кодирует ID подписки и номер страницы в одну URL-safe Base64 строку.
      *
      * @param subscriptionId ID подписки.
-     * @param pageNumber Номер страницы.
-     * @param messageId ID сообщения для редактирования или удаления.
+     * @param pageNumber     Номер страницы.
+     * @param messageId      ID сообщения для редактирования или удаления.
      * @return Закодированная строка.
      */
     public String encode(Long subscriptionId, int pageNumber, Integer messageId) {
@@ -56,7 +56,6 @@ public class PayloadEncoder {
             Integer messageId = Integer.parseInt(parts[2]);
 
             return new Payload(subscriptionId, pageNumber, messageId);
-
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to decode or parse payload: " + encodedPayload, e);
         }

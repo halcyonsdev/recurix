@@ -4,6 +4,7 @@ import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.service.UserService;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,8 +14,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обработчик стартовой команды /start.
@@ -47,9 +46,11 @@ public class StartCommand implements BotCommand {
      * <p>
      * Метод выполняет следующие ключевые действия:
      * <ol>
-     *     <li><b>Сбрасывает диалог:</b> Полностью очищает любое текущее состояние диалога пользователя в Redis.</li>
-     *     <li><b>Регистрирует пользователя:</b> Находит или создает пользователя в базе данных.</li>
-     *     <li><b>Отправляет приветствие:</b> Формирует и отправляет приветственное сообщение с главной клавиатурой.</li>
+     * <li><b>Сбрасывает диалог:</b> Полностью очищает любое текущее состояние диалога пользователя в
+     * Redis.</li>
+     * <li><b>Регистрирует пользователя:</b> Находит или создает пользователя в базе данных.</li>
+     * <li><b>Отправляет приветствие:</b> Формирует и отправляет приветственное сообщение с главной
+     * клавиатурой.</li>
      * </ol>
      *
      * @param update Объект с сообщением от пользователя.

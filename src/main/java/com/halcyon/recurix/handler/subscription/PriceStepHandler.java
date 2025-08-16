@@ -10,16 +10,15 @@ import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
 import com.halcyon.recurix.support.InputParser;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.YearMonth;
 
 /**
  * Обрабатывает ввод цены подписки на втором шаге диалога при создании подписки.
@@ -55,21 +54,18 @@ public class PriceStepHandler implements ConversationStepHandler {
         String inputText = update.getMessage().getText();
 
         Mono<SendMessage> logicMono = Mono.fromCallable(() -> inputParser.parsePrice(inputText))
-                .flatMap(price ->
-                        updateContextAndState(userId, price)
-                                .then(createNextStepMessage(userId))
-                )
-                .onErrorResume(InvalidInputException.class, e ->
-                        subscriptionMessageFactory.createErrorMessage(userId, e)
-                );
+                .flatMap(price -> updateContextAndState(userId, price)
+                        .then(createNextStepMessage(userId)))
+                .onErrorResume(InvalidInputException.class, e -> subscriptionMessageFactory.createErrorMessage(userId, e));
 
         return logicMono.map(sendMessage -> sendMessage);
     }
 
     /**
      * Обновляет контекст новой ценой и переводит диалог в следующее состояние.
+     * 
      * @param userId ID пользователя.
-     * @param price Новая цена.
+     * @param price  Новая цена.
      * @return Mono<Void>, который завершается после сохранения контекста и состояния.
      */
     private Mono<Void> updateContextAndState(Long userId, BigDecimal price) {
@@ -79,8 +75,7 @@ public class PriceStepHandler implements ConversationStepHandler {
 
                     return Mono.when(
                             stateService.setContext(userId, context),
-                            stateService.setState(userId, ConversationState.AWAITING_SUBSCRIPTION_DATE)
-                    );
+                            stateService.setState(userId, ConversationState.AWAITING_SUBSCRIPTION_DATE));
                 });
     }
 

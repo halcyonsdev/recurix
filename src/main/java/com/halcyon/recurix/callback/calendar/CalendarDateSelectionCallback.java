@@ -3,6 +3,9 @@ package com.halcyon.recurix.callback.calendar;
 import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
 import com.halcyon.recurix.service.KeyboardService;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,10 +14,6 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageRe
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.YearMonth;
 
 /**
  * Обработчик нажатия на конкретную дату в инлайн-календаре.
@@ -42,7 +41,7 @@ public class CalendarDateSelectionCallback implements Callback {
      *
      * @param update Входящий объект {@link Update} от Telegram.
      * @return {@code Mono} с объектом {@link EditMessageReplyMarkup}, содержащим только
-     *         обновленную клавиатуру
+     *             обновленную клавиатуру
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {

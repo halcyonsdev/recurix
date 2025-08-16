@@ -4,6 +4,7 @@ import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
 import com.halcyon.recurix.client.TelegramApiClient;
 import com.halcyon.recurix.service.LocalMessageService;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,8 +12,6 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обработчик для "неактивных" или информационных кнопок календаря.
@@ -41,7 +40,7 @@ public class CalendarNotificationCallback implements Callback {
      *
      * @param update Входящий объект {@link Update} от Telegram.
      * @return Всегда возвращает {@code Mono.empty()}, так как никакие сообщения
-     *         в чате изменять не нужно.
+     *             в чате изменять не нужно.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {

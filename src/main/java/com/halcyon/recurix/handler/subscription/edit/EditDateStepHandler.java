@@ -8,9 +8,8 @@ import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.support.InputParser;
 import com.halcyon.recurix.support.PeriodFormatter;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
+import org.springframework.stereotype.Component;
 
 @Component
 public class EditDateStepHandler extends BaseEditStepHandler<LocalDate> {
@@ -18,17 +17,15 @@ public class EditDateStepHandler extends BaseEditStepHandler<LocalDate> {
     private final InputParser inputParser;
 
     public EditDateStepHandler(
-            ConversationStateService stateService,
-            LocalMessageService messageService,
-            KeyboardService keyboardService,
-            TelegramApiClient telegramApiClient,
-            PeriodFormatter periodFormatter,
-            InputParser inputParser
-    ) {
+                               ConversationStateService stateService,
+                               LocalMessageService messageService,
+                               KeyboardService keyboardService,
+                               TelegramApiClient telegramApiClient,
+                               PeriodFormatter periodFormatter,
+                               InputParser inputParser) {
         super(stateService, messageService, keyboardService, telegramApiClient, periodFormatter);
         this.inputParser = inputParser;
     }
-
 
     @Override
     public boolean supports(ConversationState state) {

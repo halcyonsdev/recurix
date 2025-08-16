@@ -1,5 +1,16 @@
 package com.halcyon.recurix.command;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.halcyon.recurix.TestDataBuilder;
+import com.halcyon.recurix.model.RecurixUser;
+import com.halcyon.recurix.service.ConversationStateService;
+import com.halcyon.recurix.service.KeyboardService;
+import com.halcyon.recurix.service.LocalMessageService;
+import com.halcyon.recurix.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,28 +22,15 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-
-import com.halcyon.recurix.TestDataBuilder;
-import com.halcyon.recurix.model.RecurixUser;
-import com.halcyon.recurix.service.ConversationStateService;
-import com.halcyon.recurix.service.KeyboardService;
-import com.halcyon.recurix.service.LocalMessageService;
-import com.halcyon.recurix.service.UserService;
-
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Модульные тесты для класса {@link StartCommand}.
  */
 @ExtendWith(MockitoExtension.class)
 class StartCommandTest {
-    
+
     @Mock
     private UserService userService;
 
@@ -56,8 +54,7 @@ class StartCommandTest {
                 1L,
                 TestDataBuilder.DEFAULT_USER_ID,
                 TestDataBuilder.DEFAULT_FIRST_NAME,
-                null
-        );
+                null);
         this.expectedKeyboard = new InlineKeyboardMarkup();
 
         when(stateService.clearState(TestDataBuilder.DEFAULT_USER_ID)).thenReturn(Mono.empty());
@@ -79,7 +76,7 @@ class StartCommandTest {
                 .assertNext(botApiMethod -> {
                     assertThat(botApiMethod).isInstanceOf(SendMessage.class);
                     SendMessage sendMessage = (SendMessage) botApiMethod;
-                    
+
                     assertThat(sendMessage.getChatId()).isEqualTo(TestDataBuilder.DEFAULT_CHAT_ID.toString());
                     assertThat(sendMessage.getText()).isEqualTo(expectedText);
                     assertThat(sendMessage.getReplyMarkup()).isEqualTo(expectedKeyboard);

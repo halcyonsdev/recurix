@@ -6,6 +6,7 @@ import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
+import java.io.Serializable;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -14,8 +15,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Абстрактный базовый класс для обработчиков callback-запросов в меню редактирования подписки.
@@ -30,7 +29,9 @@ public abstract class BaseEditCallback implements Callback {
     protected final LocalMessageService messageService;
     protected final KeyboardService keyboardService;
 
-    protected BaseEditCallback(ConversationStateService stateService, LocalMessageService messageService, KeyboardService keyboardService) {
+    protected BaseEditCallback(ConversationStateService stateService,
+                               LocalMessageService messageService,
+                               KeyboardService keyboardService) {
         this.stateService = stateService;
         this.messageService = messageService;
         this.keyboardService = keyboardService;
@@ -39,21 +40,24 @@ public abstract class BaseEditCallback implements Callback {
     /**
      * Переводит диалог в новое состояние и отправляет пользователю сообщение с запросом на ввод данных.
      * <p>
-     * Этот универсальный метод используется для редактирования полей, требующих текстового ввода от пользователя
+     * Этот универсальный метод используется для редактирования полей, требующих текстового ввода от
+     * пользователя
      * (например, названия, цены, даты).
      *
      * @param update      Входящий объект {@link Update} с {@link CallbackQuery}.
-     * @param messageCode Ключ сообщения из файла properties для текста запроса (например, "dialog.add.edit.name").
-     * @param nextState   Состояние {@link ConversationState}, в которое нужно перевести диалог для ожидания ввода.
+     * @param messageCode Ключ сообщения из файла properties для текста запроса (например,
+     *                    "dialog.add.edit.name").
+     * @param nextState   Состояние {@link ConversationState}, в которое нужно перевести диалог для
+     *                    ожидания ввода.
      * @param keyboard    Клавиатура, которую нужно показать пользователю.
-     * @return {@code Mono}, содержащий готовый объект {@link EditMessageText} для отправки пользователю.
+     * @return {@code Mono}, содержащий готовый объект {@link EditMessageText} для отправки
+     *             пользователю.
      */
     protected Mono<BotApiMethod<? extends Serializable>> sendEditMessage(
-            Update update,
-            String messageCode,
-            ConversationState nextState,
-            InlineKeyboardMarkup keyboard
-    ) {
+                                                                         Update update,
+                                                                         String messageCode,
+                                                                         ConversationState nextState,
+                                                                         InlineKeyboardMarkup keyboard) {
         CallbackQuery callbackQuery = update.getCallbackQuery();
         User telegramUser = callbackQuery.getFrom();
         Long userId = telegramUser.getId();
@@ -67,15 +71,12 @@ public abstract class BaseEditCallback implements Callback {
                                 .flatMap(context -> {
                                     context.setMessageToEditId(messageId);
                                     return stateService.setContext(userId, context);
-                                })
-                )
-                .then(Mono.fromCallable(() ->
-                        EditMessageText.builder()
-                                .chatId(userId)
-                                .messageId(messageId)
-                                .text(messageService.getMessage(messageCode))
-                                .replyMarkup(keyboard)
-                                .build()
-                ));
+                                }))
+                .then(Mono.fromCallable(() -> EditMessageText.builder()
+                        .chatId(userId)
+                        .messageId(messageId)
+                        .text(messageService.getMessage(messageCode))
+                        .replyMarkup(keyboard)
+                        .build()));
     }
 }

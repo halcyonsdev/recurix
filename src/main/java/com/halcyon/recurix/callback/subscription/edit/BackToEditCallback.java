@@ -6,6 +6,7 @@ import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,8 +14,6 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обработчик для кнопки "Назад", позволяющей вернуться к главному меню редактирования подписки.
@@ -41,13 +40,16 @@ public class BackToEditCallback implements Callback {
      * <p>
      * Метод выполняет следующие действия:
      * <ol>
-     *     <li>Извлекает данные из callback-запроса.</li>
-     *     <li>Загружает из Redis актуальный контекст с данными создаваемой подписки.</li>
-     *     <li>Формирует и отправляет сообщение со списком полей для редактирования и соответствующей клавиатурой.</li>
+     * <li>Извлекает данные из callback-запроса.</li>
+     * <li>Загружает из Redis актуальный контекст с данными создаваемой подписки.</li>
+     * <li>Формирует и отправляет сообщение со списком полей для редактирования и соответствующей
+     * клавиатурой.</li>
      * </ol>
      *
      * @param update Объект, содержащий callback-запрос от пользователя.
-     * @return {@code Mono} с объектом {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText} для обновления сообщения.
+     * @return {@code Mono} с объектом
+     *             {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText}
+     *             для обновления сообщения.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
@@ -62,7 +64,6 @@ public class BackToEditCallback implements Callback {
                         userId,
                         messageId,
                         context.getSubscription(),
-                        keyboardService.getEditKeyboard(CallbackData.BACK_TO_CONFIRMATION)
-                ));
+                        keyboardService.getEditKeyboard(CallbackData.BACK_TO_CONFIRMATION)));
     }
 }

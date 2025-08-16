@@ -7,6 +7,7 @@ import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,12 +18,11 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import reactor.core.publisher.Mono;
 
-import java.io.Serializable;
-
 /**
  * Обрабатывает нажатие на кнопку выбора валюты в меню редактирования.
  * <p>
- * Срабатывает на callback-запросы, начинающиеся с префикса {@link CallbackData#CURRENCY_SELECT_PREFIX}.
+ * Срабатывает на callback-запросы, начинающиеся с префикса
+ * {@link CallbackData#CURRENCY_SELECT_PREFIX}.
  * Обновляет валюту в контексте диалога и возвращает пользователя на экран
  * подтверждения данных подписки.
  */
@@ -45,10 +45,10 @@ public class ChooseCurrencyCallback implements Callback {
      * <p>
      * Метод выполняет следующие действия:
      * <ol>
-     *     <li>Извлекает код валюты из данных callback-запроса.</li>
-     *     <li>Загружает контекст диалога {@link SubscriptionContext} из Redis.</li>
-     *     <li>Устанавливает новую валюту в объект подписки и сохраняет контекст обратно в Redis.</li>
-     *     <li>Формирует и возвращает сообщение с обновленными данными и клавиатурой подтверждения.</li>
+     * <li>Извлекает код валюты из данных callback-запроса.</li>
+     * <li>Загружает контекст диалога {@link SubscriptionContext} из Redis.</li>
+     * <li>Устанавливает новую валюту в объект подписки и сохраняет контекст обратно в Redis.</li>
+     * <li>Формирует и возвращает сообщение с обновленными данными и клавиатурой подтверждения.</li>
      * </ol>
      *
      * @param update Объект, содержащий callback-запрос от пользователя.
@@ -79,9 +79,7 @@ public class ChooseCurrencyCallback implements Callback {
                             userId,
                             messageId,
                             updatedContext.getSubscription(),
-                            confirmationKeyboard
-                    );
+                            confirmationKeyboard);
                 });
     }
-
 }

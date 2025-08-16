@@ -7,6 +7,7 @@ import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,8 +17,6 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обрабатывает выбор предопределенного периода списания (ежемесячно/ежегодно).
@@ -81,7 +80,8 @@ public class ChoosePeriodCallback implements Callback {
      * @param subscriptionContext Контекст диалога из Redis.
      * @return {@code Mono} с обновленным контекстом диалога.
      */
-    private Mono<SubscriptionContext> updateContextAndProceed(CallbackContext callbackContext, SubscriptionContext subscriptionContext) {
+    private Mono<SubscriptionContext> updateContextAndProceed(CallbackContext callbackContext,
+                                                              SubscriptionContext subscriptionContext) {
         subscriptionContext.getSubscription().setRenewalMonths(callbackContext.months);
         return stateService.setContext(callbackContext.userId, subscriptionContext).thenReturn(subscriptionContext);
     }
@@ -104,8 +104,7 @@ public class ChoosePeriodCallback implements Callback {
                 query.getFrom().getId(),
                 query.getMessage().getMessageId(),
                 subscription,
-                keyboardMarkup
-        );
+                keyboardMarkup);
     }
 
     /**

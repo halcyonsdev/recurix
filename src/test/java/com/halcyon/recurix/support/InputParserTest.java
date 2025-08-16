@@ -1,22 +1,21 @@
 package com.halcyon.recurix.support;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.halcyon.recurix.exception.DateInPastException;
 import com.halcyon.recurix.exception.InvalidDateException;
 import com.halcyon.recurix.exception.InvalidPriceException;
 import com.halcyon.recurix.exception.NegativePriceException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Модульные тесты для утилитарного класса {@link InputParser}.
@@ -46,20 +45,16 @@ class InputParserTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"не число", "10..99", "", " "})
+        @ValueSource(strings = { "не число", "10..99", "", " " })
         @DisplayName("Должен выбросить InvalidPriceException для нечислового ввода")
         void shouldThrowInvalidPriceExceptionForNonNumericInput(String invalidInput) {
-            assertThrowsExactly(InvalidPriceException.class, () ->
-                    inputParser.parsePrice(invalidInput)
-            );
+            assertThrowsExactly(InvalidPriceException.class, () -> inputParser.parsePrice(invalidInput));
         }
 
         @Test
         @DisplayName("Должен выбросить NegativePriceException для отрицательной цены")
         void shouldThrowNegativePriceExceptionForNegativePrice() {
-            assertThrowsExactly(NegativePriceException.class, () ->
-                    inputParser.parsePrice("-100")
-            );
+            assertThrowsExactly(NegativePriceException.class, () -> inputParser.parsePrice("-100"));
         }
     }
 
@@ -83,22 +78,17 @@ class InputParserTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"2025-12-25", "32.12.2025", "не дата", "", " "})
+        @ValueSource(strings = { "2025-12-25", "32.12.2025", "не дата", "", " " })
         @DisplayName("Должен выбросить InvalidDateException для некорректного формата даты")
         void shouldThrowInvalidDateExceptionForInvalidFormat(String invalidInput) {
-            assertThrowsExactly(InvalidDateException.class, () ->
-                    inputParser.parseDate(invalidInput)
-            );
+            assertThrowsExactly(InvalidDateException.class, () -> inputParser.parseDate(invalidInput));
         }
 
         @Test
         @DisplayName("Должен выбросить DateInPastException для даты в прошлом")
         void shouldThrowDateInPastExceptionForPastDate() {
             String pastDate = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-            assertThrowsExactly(DateInPastException.class, () ->
-                    inputParser.parseDate(pastDate)
-            );
+            assertThrowsExactly(DateInPastException.class, () -> inputParser.parseDate(pastDate));
         }
     }
-
 }

@@ -2,6 +2,8 @@ package com.halcyon.recurix.service;
 
 import com.halcyon.recurix.callback.CallbackRouter;
 import com.halcyon.recurix.command.BotCommand;
+import java.io.Serializable;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,9 +12,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

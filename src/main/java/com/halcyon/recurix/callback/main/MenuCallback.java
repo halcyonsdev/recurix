@@ -6,6 +6,7 @@ import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.service.UserService;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,8 +17,6 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обработчик callback-запроса для возврата в главное меню.
@@ -47,9 +46,9 @@ public class MenuCallback implements Callback {
      * <p>
      * Метод выполняет следующие действия:
      * <ol>
-     *     <li>Очищает состояние (state) диалога пользователя в Redis.</li>
-     *     <li>Находит пользователя в базе данных для получения его имени.</li>
-     *     <li>Формирует и возвращает приветственное сообщение с клавиатурой главного меню.</li>
+     * <li>Очищает состояние (state) диалога пользователя в Redis.</li>
+     * <li>Находит пользователя в базе данных для получения его имени.</li>
+     * <li>Формирует и возвращает приветственное сообщение с клавиатурой главного меню.</li>
      * </ol>
      *
      * @param update Объект, содержащий callback-запрос от пользователя.
@@ -58,7 +57,7 @@ public class MenuCallback implements Callback {
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
         CallbackQuery callbackQuery = update.getCallbackQuery();
-        User  telegramUser = callbackQuery.getFrom();
+        User telegramUser = callbackQuery.getFrom();
         Long userId = telegramUser.getId();
         Integer messageId = callbackQuery.getMessage().getMessageId();
 
@@ -66,13 +65,12 @@ public class MenuCallback implements Callback {
 
         return stateService.clearState(userId)
                 .then(userService.findOrCreateUser(telegramUser)
-                                .map(user -> EditMessageText.builder()
-                                        .chatId(userId)
-                                        .messageId(messageId)
-                                        .text(messageService.getMessage("welcome.message", user.firstName()))
-                                        .parseMode(ParseMode.MARKDOWN)
-                                        .replyMarkup(keyboardService.getMainMenuKeyboard())
-                                        .build())
-                );
+                        .map(user -> EditMessageText.builder()
+                                .chatId(userId)
+                                .messageId(messageId)
+                                .text(messageService.getMessage("welcome.message", user.firstName()))
+                                .parseMode(ParseMode.MARKDOWN)
+                                .replyMarkup(keyboardService.getMainMenuKeyboard())
+                                .build()));
     }
 }

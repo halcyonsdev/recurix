@@ -8,9 +8,8 @@ import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.support.InputParser;
 import com.halcyon.recurix.support.PeriodFormatter;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
+import org.springframework.stereotype.Component;
 
 @Component
 public class EditPriceStepHandler extends BaseEditStepHandler<BigDecimal> {
@@ -18,17 +17,15 @@ public class EditPriceStepHandler extends BaseEditStepHandler<BigDecimal> {
     private final InputParser inputParser;
 
     public EditPriceStepHandler(
-            ConversationStateService stateService,
-            LocalMessageService messageService,
-            KeyboardService keyboardService,
-            TelegramApiClient telegramApiClient,
-            PeriodFormatter periodFormatter,
-            InputParser inputParser
-    ) {
+                                ConversationStateService stateService,
+                                LocalMessageService messageService,
+                                KeyboardService keyboardService,
+                                TelegramApiClient telegramApiClient,
+                                PeriodFormatter periodFormatter,
+                                InputParser inputParser) {
         super(stateService, messageService, keyboardService, telegramApiClient, periodFormatter);
         this.inputParser = inputParser;
     }
-
 
     @Override
     public boolean supports(ConversationState state) {

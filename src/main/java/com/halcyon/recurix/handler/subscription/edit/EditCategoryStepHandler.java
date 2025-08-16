@@ -13,7 +13,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class EditCategoryStepHandler extends BaseEditStepHandler<String> {
 
-    public EditCategoryStepHandler(ConversationStateService stateService, LocalMessageService messageService, KeyboardService keyboardService, TelegramApiClient telegramApiClient, PeriodFormatter periodFormatter) {
+    public EditCategoryStepHandler(ConversationStateService stateService,
+                                   LocalMessageService messageService,
+                                   KeyboardService keyboardService,
+                                   TelegramApiClient telegramApiClient,
+                                   PeriodFormatter periodFormatter) {
         super(stateService, messageService, keyboardService, telegramApiClient, periodFormatter);
     }
 

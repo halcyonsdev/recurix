@@ -1,14 +1,10 @@
 package com.halcyon.recurix.service;
 
+import static com.halcyon.recurix.callback.CallbackData.*;
+
 import com.halcyon.recurix.model.Subscription;
 import com.halcyon.recurix.service.context.SubscriptionListContext;
 import com.halcyon.recurix.service.pagination.Page;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
@@ -16,8 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-
-import static com.halcyon.recurix.callback.CallbackData.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 /**
  * Сервис для создания и управления инлайн-клавиатурами.
@@ -184,7 +183,8 @@ public class KeyboardService {
 
     /**
      * Создает календарь для указанного месяца без предварительно выбранной даты.
-     * @param yearMonth Месяц и год для отображения.
+     * 
+     * @param yearMonth        Месяц и год для отображения.
      * @param backCallbackData callback-дата кнопки назад
      * @return Объект {@link InlineKeyboardMarkup} с календарем.
      */
@@ -195,8 +195,8 @@ public class KeyboardService {
     /**
      * Основной метод, создающий интерактивную инлайн-клавиатуру с календарем.
      *
-     * @param yearMonth     Месяц и год для отображения.
-     * @param selectedDate  Дата, которую нужно подсветить (может быть null, если ничего не выбрано).
+     * @param yearMonth    Месяц и год для отображения.
+     * @param selectedDate Дата, которую нужно подсветить (может быть null, если ничего не выбрано).
      * @return Объект {@link InlineKeyboardMarkup} с готовым календарем.
      */
     public InlineKeyboardMarkup getCalendarKeyboard(YearMonth yearMonth, LocalDate selectedDate, String backCallbackData) {
@@ -221,10 +221,12 @@ public class KeyboardService {
         YearMonth nextMonth = yearMonth.plusMonths(1);
 
         return List.of(
-                InlineKeyboardButton.builder().text("←").callbackData(CALENDAR_NAV_PREFIX + prevMonth + "_" + selectedDateStr + "_" + backCallbackData).build(),
-                InlineKeyboardButton.builder().text(String.format("%s, %d", monthName, yearMonth.getYear())).callbackData(IGNORE).build(),
-                InlineKeyboardButton.builder().text("→").callbackData(CALENDAR_NAV_PREFIX + nextMonth + "_" + selectedDateStr + "_" + backCallbackData).build()
-        );
+                InlineKeyboardButton.builder().text("←")
+                        .callbackData(CALENDAR_NAV_PREFIX + prevMonth + "_" + selectedDateStr + "_" + backCallbackData).build(),
+                InlineKeyboardButton.builder().text(String.format("%s, %d", monthName, yearMonth.getYear())).callbackData(IGNORE)
+                        .build(),
+                InlineKeyboardButton.builder().text("→")
+                        .callbackData(CALENDAR_NAV_PREFIX + nextMonth + "_" + selectedDateStr + "_" + backCallbackData).build());
     }
 
     /**
@@ -238,14 +240,14 @@ public class KeyboardService {
                 InlineKeyboardButton.builder().text("Чт").callbackData(IGNORE).build(),
                 InlineKeyboardButton.builder().text("Пт").callbackData(IGNORE).build(),
                 InlineKeyboardButton.builder().text("Сб").callbackData(IGNORE).build(),
-                InlineKeyboardButton.builder().text("Вс").callbackData(IGNORE).build()
-        );
+                InlineKeyboardButton.builder().text("Вс").callbackData(IGNORE).build());
     }
 
     /**
      * Создает сетку с днями месяца.
      */
-    private List<List<InlineKeyboardButton>> createDayGridRows(YearMonth yearMonth, LocalDate selectedDate, String backCallbackData) {
+    private List<List<InlineKeyboardButton>>
+            createDayGridRows(YearMonth yearMonth, LocalDate selectedDate, String backCallbackData) {
         List<List<InlineKeyboardButton>> dayGrid = new ArrayList<>();
         int firstDayOfWeek = yearMonth.atDay(1).getDayOfWeek().getValue();
         int daysInMonth = yearMonth.lengthOfMonth();
@@ -293,10 +295,12 @@ public class KeyboardService {
     private List<InlineKeyboardButton> createQuickSelectRow(LocalDate selectedDate, String backCallbackData) {
         String selectedDateStr = Optional.ofNullable(selectedDate).map(LocalDate::toString).orElse("");
         return List.of(
-                InlineKeyboardButton.builder().text("+1 месяц").callbackData(CALENDAR_QUICK_PREFIX + "1m_" + selectedDateStr + "_" + backCallbackData).build(),
-                InlineKeyboardButton.builder().text("+6 месяцев").callbackData(CALENDAR_QUICK_PREFIX + "6m_" + selectedDateStr + "_" + backCallbackData).build(),
-                InlineKeyboardButton.builder().text("+1 год").callbackData(CALENDAR_QUICK_PREFIX + "1y_" + selectedDateStr + "_" + backCallbackData).build()
-        );
+                InlineKeyboardButton.builder().text("+1 месяц")
+                        .callbackData(CALENDAR_QUICK_PREFIX + "1m_" + selectedDateStr + "_" + backCallbackData).build(),
+                InlineKeyboardButton.builder().text("+6 месяцев")
+                        .callbackData(CALENDAR_QUICK_PREFIX + "6m_" + selectedDateStr + "_" + backCallbackData).build(),
+                InlineKeyboardButton.builder().text("+1 год")
+                        .callbackData(CALENDAR_QUICK_PREFIX + "1y_" + selectedDateStr + "_" + backCallbackData).build());
     }
 
     /**
@@ -350,6 +354,7 @@ public class KeyboardService {
 
     /**
      * Создает клавиатуру для страницы списка подписок с кнопками пагинации.
+     * 
      * @param page Объект страницы.
      * @return Инлайн-клавиатура.
      */
@@ -369,7 +374,8 @@ public class KeyboardService {
     /**
      * Создает ряд кнопок для пагинации ("назад", "номер страницы", "вперед").
      *
-     * @param page Объект страницы для получения информации о текущей странице и общем количестве страниц.
+     * @param page Объект страницы для получения информации о текущей странице и общем количестве
+     *             страниц.
      * @return Список {@link InlineKeyboardButton}, представляющий ряд пагинации.
      */
     private List<InlineKeyboardButton> createNavigationRow(Page<Subscription> page) {
@@ -377,7 +383,9 @@ public class KeyboardService {
 
         var backButton = InlineKeyboardButton.builder()
                 .text("⬅️")
-                .callbackData(currentPage > 0 ? SUB_LIST_PAGE_PREFIX + (currentPage - 1) : IGNORE)
+                .callbackData(currentPage > 0
+                        ? SUB_LIST_PAGE_PREFIX + (currentPage - 1)
+                        : IGNORE)
                 .build();
 
         var pageIndicatorButton = InlineKeyboardButton.builder()
@@ -387,7 +395,9 @@ public class KeyboardService {
 
         var forwardButton = InlineKeyboardButton.builder()
                 .text("➡️")
-                .callbackData(currentPage < page.totalPages() - 1 ? SUB_LIST_PAGE_PREFIX + (currentPage + 1) : IGNORE)
+                .callbackData(currentPage < page.totalPages() - 1
+                        ? SUB_LIST_PAGE_PREFIX + (currentPage + 1)
+                        : IGNORE)
                 .build();
 
         return List.of(backButton, pageIndicatorButton, forwardButton);
@@ -402,10 +412,14 @@ public class KeyboardService {
      */
     private List<InlineKeyboardButton> createSortingRow(int currentPage, SubscriptionListContext context) {
         String dateSortText = messageService.getMessage("subscription.button.sort_by_date") +
-                ("paymentDate".equals(context.sortField()) && context.sortDirection() == Sort.Direction.ASC ? " ⬇️" : " ⬆️");
+                ("paymentDate".equals(context.sortField()) && context.sortDirection() == Sort.Direction.ASC
+                        ? " ⬇️"
+                        : " ⬆️");
 
         String priceSortText = messageService.getMessage("subscription.button.sort_by_price") +
-                ("price".equals(context.sortField()) && context.sortDirection() == Sort.Direction.ASC ? " ⬇️" : " ⬆️");
+                ("price".equals(context.sortField()) && context.sortDirection() == Sort.Direction.ASC
+                        ? " ⬇️"
+                        : " ⬆️");
 
         var sortByDateButton = InlineKeyboardButton.builder()
                 .text(dateSortText)
@@ -423,7 +437,8 @@ public class KeyboardService {
     /**
      * Добавляет ряды с кнопками действий ("Добавить подписку", "Назад в меню") в сборщик клавиатуры.
      *
-     * @param keyboardBuilder Сборщик {@link InlineKeyboardMarkup.InlineKeyboardMarkupBuilder}, в который добавляются ряды.
+     * @param keyboardBuilder Сборщик {@link InlineKeyboardMarkup.InlineKeyboardMarkupBuilder}, в
+     *                        который добавляются ряды.
      */
     private void addKeyboardActionRows(InlineKeyboardMarkup.InlineKeyboardMarkupBuilder keyboardBuilder) {
         keyboardBuilder.keyboardRow(List.of(getAddButton()));
@@ -439,6 +454,7 @@ public class KeyboardService {
 
     /**
      * Создает клавиатуру для экрана детального просмотра подписки.
+     * 
      * @param subscriptionId ID просматриваемой подписки.
      * @param pageNumber     Номер страницы, на которую нужно вернуться.
      * @return Инлайн-клавиатура с кнопками действий.
@@ -469,7 +485,7 @@ public class KeyboardService {
      * Создает клавиатуру для подтверждения изменений после редактирования.
      *
      * @param subscriptionId ID подписки.
-     * @param pageNumber Номер страницы для возврата.
+     * @param pageNumber     Номер страницы для возврата.
      * @return Инлайн-клавиатура.
      */
     public InlineKeyboardMarkup getEditConfirmationKeyboard(Long subscriptionId, int pageNumber) {
@@ -493,7 +509,7 @@ public class KeyboardService {
      * Создает клавиатуру для подтверждения удаления подписки.
      *
      * @param subscriptionId ID подписки.
-     * @param pageNumber Номер страницы для возврата.
+     * @param pageNumber     Номер страницы для возврата.
      * @return Клавиатура с кнопками "Да" и "Нет".
      */
     public InlineKeyboardMarkup getDeleteConfirmationKeyboard(Long subscriptionId, int pageNumber) {

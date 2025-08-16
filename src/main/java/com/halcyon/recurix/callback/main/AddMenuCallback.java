@@ -8,6 +8,7 @@ import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,8 +16,6 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обработчик callback-запроса для начала диалога по добавлению новой подписки.
@@ -41,10 +40,10 @@ public class AddMenuCallback implements Callback {
      * <p>
      * Метод выполняет следующие действия:
      * <ol>
-     *     <li>Логирует начало процесса.</li>
-     *     <li>Создает и сохраняет в Redis пустой контекст {@link SubscriptionContext} для диалога.</li>
-     *     <li>Переводит пользователя в состояние {@link ConversationState#AWAITING_SUBSCRIPTION_NAME}.</li>
-     *     <li>Отправляет пользователю сообщение с запросом на ввод названия подписки.</li>
+     * <li>Логирует начало процесса.</li>
+     * <li>Создает и сохраняет в Redis пустой контекст {@link SubscriptionContext} для диалога.</li>
+     * <li>Переводит пользователя в состояние {@link ConversationState#AWAITING_SUBSCRIPTION_NAME}.</li>
+     * <li>Отправляет пользователю сообщение с запросом на ввод названия подписки.</li>
      * </ol>
      *
      * @param update Объект, содержащий callback-запрос от пользователя.
@@ -61,13 +60,11 @@ public class AddMenuCallback implements Callback {
         Mono<Void> initializeConversation = stateService.setContext(userId, context)
                 .then(stateService.setState(userId, ConversationState.AWAITING_SUBSCRIPTION_NAME));
 
-        return initializeConversation.then(Mono.fromCallable(() ->
-                EditMessageText.builder()
-                        .chatId(userId)
-                        .messageId(messageId)
-                        .text(messageService.getMessage("dialog.add.prompt.name"))
-                        .replyMarkup(keyboardService.getBackToMenuKeyboard())
-                        .build()
-        ));
+        return initializeConversation.then(Mono.fromCallable(() -> EditMessageText.builder()
+                .chatId(userId)
+                .messageId(messageId)
+                .text(messageService.getMessage("dialog.add.prompt.name"))
+                .replyMarkup(keyboardService.getBackToMenuKeyboard())
+                .build()));
     }
 }

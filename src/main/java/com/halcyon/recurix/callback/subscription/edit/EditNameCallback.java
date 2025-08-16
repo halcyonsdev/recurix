@@ -6,12 +6,11 @@ import com.halcyon.recurix.handler.subscription.edit.EditNameStepHandler;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
+import java.io.Serializable;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обработчик callback-запроса для начала редактирования названия подписки.
@@ -25,7 +24,9 @@ import java.io.Serializable;
 @Component
 public class EditNameCallback extends BaseEditCallback {
 
-    public EditNameCallback(ConversationStateService stateService, LocalMessageService messageService, KeyboardService keyboardService) {
+    public EditNameCallback(ConversationStateService stateService,
+                            LocalMessageService messageService,
+                            KeyboardService keyboardService) {
         super(stateService, messageService, keyboardService);
     }
 
@@ -40,12 +41,14 @@ public class EditNameCallback extends BaseEditCallback {
      * Вызывает общую логику из {@link BaseEditCallback#sendEditMessage}, передавая
      * параметры, специфичные для изменения имени:
      * <ul>
-     *     <li>Ключ сообщения с запросом нового названия ({@code "dialog.add.edit.name"}).</li>
-     *     <li>Следующее состояние диалога ({@link ConversationState#AWAITING_NEW_NAME}).</li>
+     * <li>Ключ сообщения с запросом нового названия ({@code "dialog.add.edit.name"}).</li>
+     * <li>Следующее состояние диалога ({@link ConversationState#AWAITING_NEW_NAME}).</li>
      * </ul>
      *
      * @param update объект с данными от Telegram.
-     * @return {@code Mono} с готовым {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText} для отправки пользователю.
+     * @return {@code Mono} с готовым
+     *             {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText}
+     *             для отправки пользователю.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
@@ -53,7 +56,6 @@ public class EditNameCallback extends BaseEditCallback {
                 update,
                 "dialog.add.edit.name",
                 ConversationState.AWAITING_NEW_NAME,
-                keyboardService.getBackToEditKeyboard()
-        );
+                keyboardService.getBackToEditKeyboard());
     }
 }

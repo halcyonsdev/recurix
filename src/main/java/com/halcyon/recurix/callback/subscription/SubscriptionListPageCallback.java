@@ -8,6 +8,7 @@ import com.halcyon.recurix.service.UserService;
 import com.halcyon.recurix.service.context.SubscriptionListContext;
 import com.halcyon.recurix.service.pagination.PaginationConstants;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -20,8 +21,6 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обрабатывает callback-запросы для навигации между страницами списка подписок.

@@ -9,6 +9,7 @@ import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.service.SubscriptionService;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,8 +19,6 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обрабатывает запросы на просмотр детальной информации о подписке.
@@ -84,9 +83,9 @@ public class SubscriptionViewCallback implements Callback {
                                     .messageId(query.getMessage().getMessageId())
                                     .text(messageFactory.formatSubscriptionDetail(subscription))
                                     .parseMode(ParseMode.MARKDOWN)
-                                    .replyMarkup(keyboardService.getSubscriptionDetailKeyboard(ctx.subscriptionId, ctx.pageNumber))
-                                    .build()
-                            )
+                                    .replyMarkup(
+                                            keyboardService.getSubscriptionDetailKeyboard(ctx.subscriptionId, ctx.pageNumber))
+                                    .build())
                             .switchIfEmpty(handleSubscriptionNotFound(query));
                 });
     }
@@ -119,10 +118,9 @@ public class SubscriptionViewCallback implements Callback {
         log.warn("User {} tried to view a non-existent subscription.", query.getFrom().getId());
 
         return telegramApiClient.sendAnswerCallbackQuery(
-                        query.getId(),
-                        messageService.getMessage("subscription.not_found"),
-                        true
-                )
+                query.getId(),
+                messageService.getMessage("subscription.not_found"),
+                true)
                 .then(Mono.empty());
     }
 

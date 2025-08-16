@@ -28,13 +28,12 @@ public class EditPeriodStepHandler extends BaseEditStepHandler<Integer> {
     private final InputParser inputParser;
 
     public EditPeriodStepHandler(
-            ConversationStateService stateService,
-            LocalMessageService messageService,
-            KeyboardService keyboardService,
-            TelegramApiClient telegramApiClient,
-            PeriodFormatter periodFormatter,
-            InputParser inputParser
-    ) {
+                                 ConversationStateService stateService,
+                                 LocalMessageService messageService,
+                                 KeyboardService keyboardService,
+                                 TelegramApiClient telegramApiClient,
+                                 PeriodFormatter periodFormatter,
+                                 InputParser inputParser) {
         super(stateService, messageService, keyboardService, telegramApiClient, periodFormatter);
         this.inputParser = inputParser;
     }

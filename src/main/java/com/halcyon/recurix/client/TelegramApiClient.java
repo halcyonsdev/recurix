@@ -35,8 +35,9 @@ public class TelegramApiClient {
 
     /**
      * Асинхронно отправляет всплывающее уведомление в ответ на нажатие инлайн-кнопки.
+     * 
      * @param callbackQueryId Уникальный ID из объекта CallbackQuery.
-     * @param text Текст уведомления (до 200 символов).
+     * @param text            Текст уведомления (до 200 символов).
      * @return Mono<Void>, который завершается, когда запрос отправлен.
      */
     public Mono<Void> sendAnswerCallbackQuery(String callbackQueryId, String text) {
@@ -45,9 +46,10 @@ public class TelegramApiClient {
 
     /**
      * Асинхронно отправляет всплывающее уведомление в ответ на нажатие инлайн-кнопки.
+     * 
      * @param callbackQueryId Уникальный ID из объекта CallbackQuery.
-     * @param text Текст уведомления (до 200 символов).
-     * @param showAlert Если true, уведомление будет показано как алерт.
+     * @param text            Текст уведомления (до 200 символов).
+     * @param showAlert       Если true, уведомление будет показано как алерт.
      * @return Mono<Void>, который завершается, когда запрос отправлен.
      */
     public Mono<Void> sendAnswerCallbackQuery(String callbackQueryId, String text, boolean showAlert) {

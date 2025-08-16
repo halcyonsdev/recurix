@@ -12,6 +12,7 @@ import com.halcyon.recurix.service.UserService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
 import com.halcyon.recurix.service.pagination.PaginationConstants;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -23,8 +24,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
-
-import java.io.Serializable;
 
 /**
  * Обработчик callback-запроса для сохранения новой подписки.
@@ -55,14 +54,16 @@ public class SaveSubscriptionCallback implements Callback {
      * <p>
      * Метод выполняет следующие действия:
      * <ol>
-     *     <li>Отправляет пользователю всплывающее уведомление об успешном сохранении.</li>
-     *     <li>Вызывает приватный метод для извлечения данных из контекста и сохранения их в БД.</li>
-     *     <li>Полностью завершает диалог, очищая состояние и контекст в Redis.</li>
-     *     <li>Загружает и отображает обновленный список всех подписок пользователя.</li>
+     * <li>Отправляет пользователю всплывающее уведомление об успешном сохранении.</li>
+     * <li>Вызывает приватный метод для извлечения данных из контекста и сохранения их в БД.</li>
+     * <li>Полностью завершает диалог, очищая состояние и контекст в Redis.</li>
+     * <li>Загружает и отображает обновленный список всех подписок пользователя.</li>
      * </ol>
      *
      * @param update Входящее обновление от Telegram с {@link CallbackQuery}.
-     * @return {@code Mono}, содержащий {@link org.telegram.telegrambots.meta.api.methods.send.SendMessage} с первой страницей списка подписок.
+     * @return {@code Mono}, содержащий
+     *             {@link org.telegram.telegrambots.meta.api.methods.send.SendMessage} с первой
+     *             страницей списка подписок.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
@@ -80,17 +81,20 @@ public class SaveSubscriptionCallback implements Callback {
         return telegramApiClient.sendAnswerCallbackQuery(callbackQuery.getId(), messageService.getMessage("add.success"))
                 .then(telegramApiClient.deleteMessage(chatId, messageId))
                 .then(userMono.flatMap(userId -> {
-                    Pageable pageable = PageRequest.of(0, PaginationConstants.DEFAULT_PAGE_SIZE, PaginationConstants.DEFAULT_SORT);
+                    Pageable pageable = PageRequest.of(0, PaginationConstants.DEFAULT_PAGE_SIZE,
+                            PaginationConstants.DEFAULT_SORT);
                     return subscriptionService.getSubscriptionsAsPage(userId, pageable);
                 }))
                 .map(page -> subscriptionMessageFactory.createNewSubscriptionsPageMessage(chatId, messageId, page));
     }
 
     /**
-     * Извлекает данные из контекста диалога, связывает их с пользователем и сохраняет новую подписку в базе данных.
+     * Извлекает данные из контекста диалога, связывает их с пользователем и сохраняет новую подписку в
+     * базе данных.
      *
      * @param telegramUser пользователь Telegram, для которого сохраняется подписка.
-     * @return {@code Mono}, содержащий сохраненный объект {@link Subscription}, или {@code Mono.empty()}, если контекст не найден.
+     * @return {@code Mono}, содержащий сохраненный объект {@link Subscription}, или
+     *             {@code Mono.empty()}, если контекст не найден.
      */
     private Mono<Subscription> saveSubscriptionFromContext(org.telegram.telegrambots.meta.api.objects.User telegramUser) {
         Mono<RecurixUser> userMono = userService.findOrCreateUser(telegramUser);

@@ -13,6 +13,7 @@ import com.halcyon.recurix.service.context.SubscriptionListContext;
 import com.halcyon.recurix.service.pagination.Page;
 import com.halcyon.recurix.service.pagination.PaginationConstants;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -27,20 +28,18 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
 
-import java.io.Serializable;
-
 /**
  * Обрабатывает финальное подтверждение на удаление подписки.
  * <p>
  * Этот класс является завершающим шагом в процессе удаления. Он выполняет
  * следующие действия:
  * <ol>
- *     <li>Отправляет пользователю всплывающее уведомление об успешном удалении.</li>
- *     <li>Находит внутреннего пользователя системы по его Telegram ID.</li>
- *     <li>Удаляет подписку из базы данных.</li>
- *     <li>Пересчитывает корректный номер страницы для отображения (на случай, если удаленная
- *     подписка была последней на странице).</li>
- *     <li>Обновляет сообщение, показывая актуализированный список подписок.</li>
+ * <li>Отправляет пользователю всплывающее уведомление об успешном удалении.</li>
+ * <li>Находит внутреннего пользователя системы по его Telegram ID.</li>
+ * <li>Удаляет подписку из базы данных.</li>
+ * <li>Пересчитывает корректный номер страницы для отображения (на случай, если удаленная
+ * подписка была последней на странице).</li>
+ * <li>Обновляет сообщение, показывая актуализированный список подписок.</li>
  * </ol>
  *
  * @see DeleteConfirmationCallback
@@ -91,8 +90,7 @@ public class DeleteExecuteCallback implements Callback {
     private Mono<Void> sendSuccessNotification(String callbackQueryId) {
         return telegramApiClient.sendAnswerCallbackQuery(
                 callbackQueryId,
-                messageService.getMessage("delete.success")
-        );
+                messageService.getMessage("delete.success"));
     }
 
     /**
@@ -118,12 +116,14 @@ public class DeleteExecuteCallback implements Callback {
      * @param recurixUser Внутренний пользователь системы.
      * @return {@code Mono} с готовым для отправки сообщением.
      */
-    private Mono<BotApiMethod<? extends Serializable>> deleteAndRefreshList(CallbackQuery query, CallbackContext context, RecurixUser recurixUser) {
+    private Mono<BotApiMethod<? extends Serializable>>
+            deleteAndRefreshList(CallbackQuery query, CallbackContext context, RecurixUser recurixUser) {
         return subscriptionService.deleteById(context.subscriptionId)
                 .then(subscriptionService.countByUserId(recurixUser.id()))
                 .flatMap(totalCount -> {
                     int targetPage = calculateTargetPage(totalCount, context.originalPageNumber);
-                    Pageable pageable = PageRequest.of(targetPage, PaginationConstants.DEFAULT_PAGE_SIZE, PaginationConstants.DEFAULT_SORT);
+                    Pageable pageable = PageRequest.of(targetPage, PaginationConstants.DEFAULT_PAGE_SIZE,
+                            PaginationConstants.DEFAULT_SORT);
                     return subscriptionService.getSubscriptionsAsPage(recurixUser.id(), pageable);
                 })
                 .map(page -> createListPageMessage(query, page));
@@ -138,7 +138,9 @@ public class DeleteExecuteCallback implements Callback {
      */
     private int calculateTargetPage(int totalCount, int originalPageNumber) {
         int pageSize = PaginationConstants.DEFAULT_PAGE_SIZE;
-        int newTotalPages = (totalCount == 0) ? 1 : (int) Math.ceil((double) totalCount / pageSize);
+        int newTotalPages = (totalCount == 0)
+                ? 1
+                : (int) Math.ceil((double) totalCount / pageSize);
         int targetPage = Math.min(originalPageNumber, newTotalPages - 1);
 
         return Math.max(targetPage, 0);

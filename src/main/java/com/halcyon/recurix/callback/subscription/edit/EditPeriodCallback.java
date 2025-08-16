@@ -4,13 +4,12 @@ import com.halcyon.recurix.callback.CallbackData;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
+import java.io.Serializable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обрабатывает нажатие на кнопку "Изменить период" в меню редактирования.
@@ -25,7 +24,9 @@ import java.io.Serializable;
 @Slf4j
 public class EditPeriodCallback extends BaseEditCallback {
 
-    public EditPeriodCallback(ConversationStateService stateService, LocalMessageService messageService, KeyboardService keyboardService) {
+    public EditPeriodCallback(ConversationStateService stateService,
+                              LocalMessageService messageService,
+                              KeyboardService keyboardService) {
         super(stateService, messageService, keyboardService);
     }
 
@@ -39,8 +40,9 @@ public class EditPeriodCallback extends BaseEditCallback {
      * клавиатурой выбора периода списания.
      *
      * @param update Объект {@link Update} от Telegram.
-     * @return {@code Mono} с {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText}
-     *         для обновления сообщения.
+     * @return {@code Mono} с
+     *             {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText}
+     *             для обновления сообщения.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
@@ -48,7 +50,6 @@ public class EditPeriodCallback extends BaseEditCallback {
                 update,
                 "dialog.add.edit.period.prompt",
                 null,
-                keyboardService.getPeriodSelectionKeyboard()
-        );
+                keyboardService.getPeriodSelectionKeyboard());
     }
 }

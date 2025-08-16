@@ -25,8 +25,7 @@ public class SpringConfig {
         RecurixBot recurixBot = new RecurixBot(
                 setWebhook,
                 telegramConfig.getBotToken(),
-                updateHandlerService
-        );
+                updateHandlerService);
 
         recurixBot.setBotPath(telegramConfig.getWebhookUrl());
         recurixBot.setBotUsername(telegramConfig.getBotUsername());

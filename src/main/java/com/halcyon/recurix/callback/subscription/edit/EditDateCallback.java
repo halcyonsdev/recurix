@@ -5,14 +5,13 @@ import com.halcyon.recurix.handler.ConversationState;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
+import java.io.Serializable;
+import java.time.YearMonth;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
-import java.time.YearMonth;
 
 /**
  * Обработчик callback-запроса для начала редактирования даты следующего платежа.
@@ -26,7 +25,9 @@ import java.time.YearMonth;
 @Component
 public class EditDateCallback extends BaseEditCallback {
 
-    public EditDateCallback(ConversationStateService stateService, LocalMessageService messageService, KeyboardService keyboardService) {
+    public EditDateCallback(ConversationStateService stateService,
+                            LocalMessageService messageService,
+                            KeyboardService keyboardService) {
         super(stateService, messageService, keyboardService);
     }
 
@@ -41,8 +42,8 @@ public class EditDateCallback extends BaseEditCallback {
      * Вызывает общую логику из {@link BaseEditCallback#sendEditMessage}, передавая
      * параметры, специфичные для изменения даты:
      * <ul>
-     *     <li>Ключ сообщения с запросом новой даты ({@code "dialog.add.edit.date"}).</li>
-     *     <li>Следующее состояние диалога ({@link ConversationState#AWAITING_NEW_DATE}).</li>
+     * <li>Ключ сообщения с запросом новой даты ({@code "dialog.add.edit.date"}).</li>
+     * <li>Следующее состояние диалога ({@link ConversationState#AWAITING_NEW_DATE}).</li>
      * </ul>
      *
      * @param update объект с данными от Telegram.
@@ -54,7 +55,6 @@ public class EditDateCallback extends BaseEditCallback {
                 update,
                 "dialog.add.prompt.date",
                 ConversationState.AWAITING_NEW_DATE,
-                keyboardService.getCalendarKeyboard(YearMonth.now(), CallbackData.BACK_TO_EDIT)
-        );
+                keyboardService.getCalendarKeyboard(YearMonth.now(), CallbackData.BACK_TO_EDIT));
     }
 }

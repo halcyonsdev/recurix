@@ -8,6 +8,9 @@ import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,10 +20,6 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.Set;
 
 /**
  * Обрабатывает нажатие кнопки "Применить" в календаре.
@@ -43,8 +42,7 @@ public class CalendarApplyCallback implements Callback {
 
     private static final Set<ConversationState> SUPPORTED_STATES = Set.of(
             ConversationState.AWAITING_SUBSCRIPTION_DATE,
-            ConversationState.AWAITING_NEW_DATE
-    );
+            ConversationState.AWAITING_NEW_DATE);
 
     @Override
     public boolean supports(String callbackData) {
@@ -128,7 +126,6 @@ public class CalendarApplyCallback implements Callback {
                 query.getFrom().getId(),
                 query.getMessage().getMessageId(),
                 subscription,
-                keyboard
-        );
+                keyboard);
     }
 }

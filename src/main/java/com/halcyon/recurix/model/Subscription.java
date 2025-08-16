@@ -1,12 +1,11 @@
 package com.halcyon.recurix.model;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Table(name = "subscriptions")
 @Builder
@@ -41,4 +40,3 @@ public class Subscription {
     @Column("category")
     private String category;
 }
-

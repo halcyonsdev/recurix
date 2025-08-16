@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
  * Утилитарный класс-строитель для создания тестовых объектов Telegram.
  */
 public class TestDataBuilder {
-    
+
     public static final Long DEFAULT_USER_ID = 12345L;
     public static final Long DEFAULT_CHAT_ID = 54321L;
     public static final Integer DEFAULT_MESSAGE_ID = 987;
@@ -19,13 +19,13 @@ public class TestDataBuilder {
         Update update = new Update();
         Message message = new Message();
         Chat chat = new Chat();
-        
+
         chat.setId(DEFAULT_CHAT_ID);
         message.setChat(chat);
         message.setMessageId(DEFAULT_MESSAGE_ID);
         message.setText(text);
         message.setFrom(buildTelegramUser());
-        
+
         update.setMessage(message);
         return update;
     }
@@ -37,5 +37,4 @@ public class TestDataBuilder {
         telegramUser.setIsBot(false);
         return telegramUser;
     }
-
 }

@@ -3,10 +3,11 @@ package com.halcyon.recurix.callback.subscription.add;
 import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
 import com.halcyon.recurix.client.TelegramApiClient;
+import com.halcyon.recurix.handler.ConversationState;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
-import com.halcyon.recurix.handler.ConversationState;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,8 +16,6 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обработчик callback-запроса для перезапуска диалога добавления подписки.
@@ -45,8 +44,9 @@ public class RestartSubscriptionCallback implements Callback {
      * <p>
      * Метод выполняет следующие действия:
      * <ol>
-     *     <li>Отправляет пользователю всплывающее уведомление о перезапуске.</li>
-     *     <li>Инициирует новый диалог добавления, аналогично {@link com.halcyon.recurix.callback.main.AddMenuCallback}.</li>
+     * <li>Отправляет пользователю всплывающее уведомление о перезапуске.</li>
+     * <li>Инициирует новый диалог добавления, аналогично
+     * {@link com.halcyon.recurix.callback.main.AddMenuCallback}.</li>
      * </ol>
      *
      * @param update Объект, содержащий callback-запрос от пользователя.
@@ -62,8 +62,7 @@ public class RestartSubscriptionCallback implements Callback {
 
         return telegramApiClient.sendAnswerCallbackQuery(
                 callbackQuery.getId(),
-                messageService.getMessage("dialog.confirm.restarted")
-        ).then(startCreateSubscriptionDialog(userId, messageId));
+                messageService.getMessage("dialog.confirm.restarted")).then(startCreateSubscriptionDialog(userId, messageId));
     }
 
     /**

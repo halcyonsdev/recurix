@@ -3,6 +3,9 @@ package com.halcyon.recurix.callback.calendar;
 import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
 import com.halcyon.recurix.service.KeyboardService;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,10 +14,6 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageRe
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.YearMonth;
 
 /**
  * Обработчик нажатий на кнопки навигации ("←", "→") в инлайн-календаре.
@@ -42,7 +41,7 @@ public class CalendarNavigationCallback implements Callback {
      *
      * @param update Входящий объект {@link Update} от Telegram.
      * @return {@code Mono} с объектом {@link EditMessageReplyMarkup}, содержащим только
-     *         обновленную клавиатуру
+     *             обновленную клавиатуру
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
@@ -56,7 +55,9 @@ public class CalendarNavigationCallback implements Callback {
         }
 
         YearMonth targetYearMonth = YearMonth.parse(parts[0]);
-        LocalDate selectedDate = parts[1].isEmpty() ? null : LocalDate.parse(parts[1]);
+        LocalDate selectedDate = parts[1].isEmpty()
+                ? null
+                : LocalDate.parse(parts[1]);
         String backCallbackData = parts[2];
 
         log.info("User {} navigating calendar to {}. Preserving selected date [{}] and back command [{}]",

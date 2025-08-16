@@ -6,13 +6,12 @@ import com.halcyon.recurix.handler.subscription.edit.EditPeriodStepHandler;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
+import java.io.Serializable;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обрабатывает нажатие на кнопку "Другой период..." при редактировании подписки.
@@ -28,7 +27,9 @@ import java.io.Serializable;
 @Component
 public class CustomPeriodCallback extends BaseEditCallback {
 
-    public CustomPeriodCallback(ConversationStateService stateService, LocalMessageService messageService, KeyboardService keyboardService) {
+    public CustomPeriodCallback(ConversationStateService stateService,
+                                LocalMessageService messageService,
+                                KeyboardService keyboardService) {
         super(stateService, messageService, keyboardService);
     }
 
@@ -50,7 +51,6 @@ public class CustomPeriodCallback extends BaseEditCallback {
                 update,
                 "dialog.add.edit.period.custom_prompt",
                 ConversationState.AWAITING_NEW_PERIOD_MONTHS,
-                keyboardService.getBackToEditKeyboard()
-        );
+                keyboardService.getBackToEditKeyboard());
     }
 }

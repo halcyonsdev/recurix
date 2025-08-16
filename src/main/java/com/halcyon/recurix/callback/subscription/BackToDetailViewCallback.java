@@ -4,6 +4,7 @@ import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
 import com.halcyon.recurix.callback.subscription.edit.EditFromDetailViewCallback;
 import com.halcyon.recurix.service.ConversationStateService;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,8 +12,6 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обрабатывает нажатие кнопки "Назад" из меню редактирования подписки.
@@ -42,7 +41,7 @@ public class BackToDetailViewCallback implements Callback {
      *
      * @param update Объект {@link Update} от Telegram.
      * @return {@code Mono} с {@link EditMessageText}
-     *         для возврата к детальному просмотру.
+     *             для возврата к детальному просмотру.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {

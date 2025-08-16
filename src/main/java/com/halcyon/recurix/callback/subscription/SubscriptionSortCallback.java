@@ -9,6 +9,8 @@ import com.halcyon.recurix.service.UserService;
 import com.halcyon.recurix.service.context.SubscriptionListContext;
 import com.halcyon.recurix.service.pagination.PaginationConstants;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -22,9 +24,6 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * Обрабатывает запросы на сортировку списка подписок.
@@ -70,8 +69,7 @@ public class SubscriptionSortCallback implements Callback {
                         telegramUser,
                         messageId,
                         sortRequest.currentPage,
-                        newContext
-                ));
+                        newContext));
     }
 
     /**
@@ -96,7 +94,7 @@ public class SubscriptionSortCallback implements Callback {
      * Метод загружает текущий контекст из Redis, вычисляет новый на основе запроса пользователя,
      * сохраняет его обратно в Redis и возвращает в виде {@code Mono}.
      *
-     * @param userId ID пользователя, для которого обновляется контекст.
+     * @param userId             ID пользователя, для которого обновляется контекст.
      * @param requestedSortField Поле, по которому пользователь запросил сортировку.
      * @return {@code Mono}, который эммитит новый сохраненный {@link SubscriptionListContext}.
      */
@@ -114,7 +112,7 @@ public class SubscriptionSortCallback implements Callback {
     /**
      * Вычисляет следующий контекст сортировки на основе текущего состояния и запрошенного поля.
      *
-     * @param currentContext Текущий контекст с полем и направлением сортировки.
+     * @param currentContext     Текущий контекст с полем и направлением сортировки.
      * @param requestedSortField Поле, по которому пользователь запросил сортировку.
      * @return Новый, вычисленный контекст сортировки.
      */
@@ -137,22 +135,20 @@ public class SubscriptionSortCallback implements Callback {
      * данные из сервиса подписок и строит готовое сообщение с обновленным списком и клавиатурой.
      *
      * @param telegramUser пользователь для отправки сообщения.
-     * @param messageId ID сообщения, которое нужно отредактировать.
-     * @param currentPage Номер страницы, которую нужно отобразить.
-     * @param newContext Новый контекст сортировки для запроса данных и отрисовки клавиатуры.
+     * @param messageId    ID сообщения, которое нужно отредактировать.
+     * @param currentPage  Номер страницы, которую нужно отобразить.
+     * @param newContext   Новый контекст сортировки для запроса данных и отрисовки клавиатуры.
      * @return {@code Mono}, содержащий готовый к отправке объект {@link EditMessageText}.
      */
     private Mono<EditMessageText> buildSuccessResponse(
-            User telegramUser,
-            Integer messageId,
-            int currentPage,
-            SubscriptionListContext newContext
-    ) {
+                                                       User telegramUser,
+                                                       Integer messageId,
+                                                       int currentPage,
+                                                       SubscriptionListContext newContext) {
         Pageable pageable = PageRequest.of(
                 currentPage,
                 PaginationConstants.DEFAULT_PAGE_SIZE,
-                Sort.by(newContext.sortDirection(), newContext.sortField())
-        );
+                Sort.by(newContext.sortDirection(), newContext.sortField()));
 
         return userService.findOrCreateUser(telegramUser)
                 .flatMap(user -> subscriptionService.getSubscriptionsAsPage(user.id(), pageable))
@@ -167,8 +163,9 @@ public class SubscriptionSortCallback implements Callback {
 
     /**
      * Простая запись (record) для хранения разобранных данных из callback-запроса.
+     * 
      * @param requestedSortField Поле, по которому запрошена сортировка ("paymentDate" или "price").
-     * @param currentPage Текущий номер страницы, на которой находится пользователь.
+     * @param currentPage        Текущий номер страницы, на которой находится пользователь.
      */
     private record SortRequest(String requestedSortField, int currentPage) {}
 }

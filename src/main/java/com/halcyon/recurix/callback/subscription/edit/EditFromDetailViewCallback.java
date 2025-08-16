@@ -8,6 +8,7 @@ import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.SubscriptionService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,8 +18,6 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обрабатывает запрос на начало редактирования подписки из ее детального просмотра.
@@ -93,8 +92,8 @@ public class EditFromDetailViewCallback implements Callback {
     /**
      * Создает ответ для Telegram API с обновленной клавиатурой.
      *
-     * @param query        Исходный {@link CallbackQuery}.
-     * @param context      Распарсенные данные из callback-запроса.
+     * @param query   Исходный {@link CallbackQuery}.
+     * @param context Распарсенные данные из callback-запроса.
      * @return Готовый объект {@link EditMessageReplyMarkup}.
      */
     private EditMessageReplyMarkup createEditMenuMarkup(CallbackQuery query, CallbackContext context) {

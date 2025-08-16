@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 public interface SubscriptionRepository extends ReactiveCrudRepository<Subscription, Long> {
 
     Flux<Subscription> findAllByUserId(Long userId);
+
     Flux<Subscription> findAllByUserId(Long userId, Pageable pageable);
 
     Mono<Integer> countByUserId(Long userId);

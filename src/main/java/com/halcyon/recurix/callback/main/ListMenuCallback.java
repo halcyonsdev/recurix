@@ -8,6 +8,7 @@ import com.halcyon.recurix.service.UserService;
 import com.halcyon.recurix.service.context.SubscriptionListContext;
 import com.halcyon.recurix.service.pagination.PaginationConstants;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -21,8 +22,6 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обработчик callback-запроса для отображения списка подписок пользователя.
@@ -50,15 +49,16 @@ public class ListMenuCallback implements Callback {
      * <p>
      * Метод выполняет следующие действия:
      * <ol>
-     *     <li>Извлекает информацию о пользователе, чате и сообщении из объекта {@code Update}.</li>
-     *     <li>Находит или создает пользователя в базе данных.</li>
-     *     <li>Получает все подписки этого пользователя для первой страницы.</li>
-     *     <li>Использует {@link SubscriptionMessageFactory} для создания отформатированного сообщения со списком.</li>
+     * <li>Извлекает информацию о пользователе, чате и сообщении из объекта {@code Update}.</li>
+     * <li>Находит или создает пользователя в базе данных.</li>
+     * <li>Получает все подписки этого пользователя для первой страницы.</li>
+     * <li>Использует {@link SubscriptionMessageFactory} для создания отформатированного сообщения со
+     * списком.</li>
      * </ol>
      *
      * @param update Объект, содержащий callback-запрос от пользователя.
      * @return {@code Mono} с объектом {@link EditMessageText},
-     * который обновляет исходное сообщение, отображая список подписок.
+     *             который обновляет исходное сообщение, отображая список подписок.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {

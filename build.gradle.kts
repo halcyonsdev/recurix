@@ -4,6 +4,7 @@ plugins {
     java
     id("org.springframework.boot") version "3.3.1"
     id("io.spring.dependency-management") version "1.1.5"
+    id("com.diffplug.spotless") version "7.0.2"
 }
 
 group = "com.halcyon"
@@ -43,6 +44,19 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
+}
+
+apply(plugin = "com.diffplug.spotless")
+
+spotless {
+    java {
+        encoding("UTF-8")
+        importOrder()
+        removeUnusedImports()
+        eclipse("4.21").configFile("${rootDir}/config/codestyle.xml")
+
+        targetExclude("build/generated/**", "build/generated/source/proto/**")
+    }
 }
 
 tasks.withType<Test> {

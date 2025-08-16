@@ -6,6 +6,7 @@ import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -13,8 +14,6 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обработчик callback-запроса для возврата из меню редактирования на экран подтверждения.
@@ -40,8 +39,9 @@ public class BackToConfirmationCallback implements Callback {
      * <p>
      * Метод выполняет следующие действия:
      * <ol>
-     *     <li>Загружает из Redis актуальный контекст {@link SubscriptionContext} диалога.</li>
-     *     <li>Использует {@link SubscriptionMessageFactory} для перерисовки сообщения с данными подписки и кнопками "Сохранить", "Изменить" и т.д.</li>
+     * <li>Загружает из Redis актуальный контекст {@link SubscriptionContext} диалога.</li>
+     * <li>Использует {@link SubscriptionMessageFactory} для перерисовки сообщения с данными подписки и
+     * кнопками "Сохранить", "Изменить" и т.д.</li>
      * </ol>
      *
      * @param update Объект, содержащий callback-запрос от пользователя.
@@ -58,7 +58,6 @@ public class BackToConfirmationCallback implements Callback {
                         userId,
                         messageId,
                         context.getSubscription(),
-                        keyboardService.getConfirmationKeyboard()
-                ));
+                        keyboardService.getConfirmationKeyboard()));
     }
 }

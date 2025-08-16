@@ -1,6 +1,7 @@
 package com.halcyon.recurix;
 
 import com.halcyon.recurix.service.UpdateHandlerService;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -8,9 +9,6 @@ import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.starter.SpringWebhookBot;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
-
 
 @Getter
 @Setter

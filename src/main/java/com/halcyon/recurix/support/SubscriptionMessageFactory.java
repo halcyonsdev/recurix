@@ -6,6 +6,11 @@ import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.service.context.SubscriptionListContext;
 import com.halcyon.recurix.service.pagination.Page;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
+import java.util.Locale;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -14,12 +19,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import reactor.core.publisher.Mono;
-
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -39,11 +38,10 @@ public class SubscriptionMessageFactory {
             .toFormatter(Locale.forLanguageTag("ru"));
 
     public EditMessageText createEditMessage(
-            Long userId,
-            Integer messageId,
-            Subscription subscription,
-            InlineKeyboardMarkup keyboard
-    ) {
+                                             Long userId,
+                                             Integer messageId,
+                                             Subscription subscription,
+                                             InlineKeyboardMarkup keyboard) {
         String summary = messageService.getMessage(
                 "dialog.add.prompt.confirmation",
                 subscription.getName(),
@@ -51,8 +49,7 @@ public class SubscriptionMessageFactory {
                 subscription.getPaymentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
                 subscription.getCurrency(),
                 subscription.getCategory(),
-                periodFormatter.format(subscription.getRenewalMonths())
-        );
+                periodFormatter.format(subscription.getRenewalMonths()));
 
         return EditMessageText.builder()
                 .chatId(userId)
@@ -78,8 +75,9 @@ public class SubscriptionMessageFactory {
     /**
      * Создает новый объект SendMessage со списком подписок.
      * Подходит для отправки после удаления старого сообщения.
-     * @param chatId ID чата для отправки.
-     * @param page Объект страницы с подписками.
+     * 
+     * @param chatId    ID чата для отправки.
+     * @param page      Объект страницы с подписками.
      * @param messageId ID нового сообщения, которое будет создано.
      * @return Готовый объект SendMessage.
      */
@@ -106,20 +104,19 @@ public class SubscriptionMessageFactory {
                         subscription.getPrice(),
                         subscription.getCurrency(),
                         subscription.getPaymentDate().format(DATE_FORMATTER),
-                        "/view_" + payloadEncoder.encode(subscription.getId(), page.currentPage(), messageId)
-                ))
+                        "/view_" + payloadEncoder.encode(subscription.getId(), page.currentPage(), messageId)))
                 .collect(Collectors.joining("\n\n"));
 
         String mainContent = messageService.getMessage(
                 "subscriptions.list.paginated_header",
-                listItems
-        );
+                listItems);
 
         return mainContent + "\n\n<code>────────────────────</code>";
     }
 
     /**
      * Формирует текстовое содержимое для детального просмотра одной подписки.
+     * 
      * @param subscription Подписка для отображения.
      * @return Отформатированная строка для отправки.
      */
@@ -131,7 +128,6 @@ public class SubscriptionMessageFactory {
                 subscription.getCurrency(),
                 subscription.getPaymentDate().format(DATE_FORMATTER),
                 subscription.getCategory(),
-                periodFormatter.format(subscription.getRenewalMonths())
-        );
+                periodFormatter.format(subscription.getRenewalMonths()));
     }
 }

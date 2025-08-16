@@ -6,14 +6,13 @@ import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 @Component
 @RequiredArgsConstructor
@@ -44,7 +43,6 @@ public class NameStepHandler implements ConversationStepHandler {
                                 .chatId(userId)
                                 .text(messageService.getMessage("dialog.add.prompt.price"))
                                 .replyMarkup(keyboardService.getBackToMenuKeyboard())
-                                .build()
-                ));
+                                .build()));
     }
 }

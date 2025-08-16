@@ -6,12 +6,11 @@ import com.halcyon.recurix.handler.subscription.edit.EditPriceStepHandler;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
+import java.io.Serializable;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обработчик callback-запроса для начала редактирования цены подписки.
@@ -25,7 +24,9 @@ import java.io.Serializable;
 @Component
 public class EditPriceCallback extends BaseEditCallback {
 
-    public EditPriceCallback(ConversationStateService stateService, LocalMessageService messageService, KeyboardService keyboardService) {
+    public EditPriceCallback(ConversationStateService stateService,
+                             LocalMessageService messageService,
+                             KeyboardService keyboardService) {
         super(stateService, messageService, keyboardService);
     }
 
@@ -40,12 +41,14 @@ public class EditPriceCallback extends BaseEditCallback {
      * Вызывает общую логику из {@link BaseEditCallback#sendEditMessage}, передавая
      * параметры, специфичные для изменения цены:
      * <ul>
-     *     <li>Ключ сообщения с запросом новой цены ({@code "dialog.add.edit.price"}).</li>
-     *     <li>Следующее состояние диалога ({@link ConversationState#AWAITING_NEW_PRICE}).</li>
+     * <li>Ключ сообщения с запросом новой цены ({@code "dialog.add.edit.price"}).</li>
+     * <li>Следующее состояние диалога ({@link ConversationState#AWAITING_NEW_PRICE}).</li>
      * </ul>
      *
      * @param update объект с данными от Telegram.
-     * @return {@code Mono} с готовым {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText} для отправки пользователю.
+     * @return {@code Mono} с готовым
+     *             {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText}
+     *             для отправки пользователю.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
@@ -53,7 +56,6 @@ public class EditPriceCallback extends BaseEditCallback {
                 update,
                 "dialog.add.edit.price",
                 ConversationState.AWAITING_NEW_PRICE,
-                keyboardService.getBackToEditKeyboard()
-        );
+                keyboardService.getBackToEditKeyboard());
     }
 }

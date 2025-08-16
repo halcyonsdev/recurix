@@ -6,6 +6,7 @@ import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,8 +15,6 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обработчик callback-запроса для перехода в меню редактирования подписки.
@@ -42,8 +41,9 @@ public class EditSubscriptionCallback implements Callback {
      * <p>
      * Метод выполняет следующие действия:
      * <ol>
-     *     <li>Загружает из Redis актуальный контекст {@link SubscriptionContext}.</li>
-     *     <li>Использует {@link SubscriptionMessageFactory} для формирования сообщения со списком полей для редактирования.</li>
+     * <li>Загружает из Redis актуальный контекст {@link SubscriptionContext}.</li>
+     * <li>Использует {@link SubscriptionMessageFactory} для формирования сообщения со списком полей для
+     * редактирования.</li>
      * </ol>
      *
      * @param update Объект, содержащий callback-запрос от пользователя.
@@ -62,7 +62,6 @@ public class EditSubscriptionCallback implements Callback {
                         userId,
                         messageId,
                         context.getSubscription(),
-                        keyboardService.getEditKeyboard(CallbackData.BACK_TO_CONFIRMATION)
-                ));
+                        keyboardService.getEditKeyboard(CallbackData.BACK_TO_CONFIRMATION)));
     }
 }

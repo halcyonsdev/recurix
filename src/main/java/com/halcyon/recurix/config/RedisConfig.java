@@ -22,8 +22,8 @@ public class RedisConfig {
 
         var valueSerializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
-        RedisSerializationContext.RedisSerializationContextBuilder<String, Object> builder =
-                RedisSerializationContext.newSerializationContext(keySerializer);
+        RedisSerializationContext.RedisSerializationContextBuilder<String, Object> builder = RedisSerializationContext
+                .newSerializationContext(keySerializer);
 
         RedisSerializationContext<String, Object> context = builder.value(valueSerializer).build();
 

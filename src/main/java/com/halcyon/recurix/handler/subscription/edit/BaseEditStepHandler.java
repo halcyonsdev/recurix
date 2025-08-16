@@ -9,6 +9,9 @@ import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
 import com.halcyon.recurix.support.PeriodFormatter;
+import java.io.Serializable;
+import java.time.format.DateTimeFormatter;
+import java.util.function.Consumer;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -17,16 +20,13 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import reactor.core.publisher.Mono;
 
-import java.io.Serializable;
-import java.time.format.DateTimeFormatter;
-import java.util.function.Consumer;
-
 /**
  * Абстрактный базовый класс для обработчиков шагов редактирования подписки.
  * Инкапсулирует общую логику: получение контекста, выполнение побочных эффектов
  * (удаление сообщений, смена состояния) и формирование ответного сообщения.
  *
- * @param <T> Тип данных, получаемых от пользователя (например, String для имени, BigDecimal для цены).
+ * @param <T> Тип данных, получаемых от пользователя (например, String для имени, BigDecimal для
+ *            цены).
  */
 public abstract class BaseEditStepHandler<T> implements ConversationStepHandler {
 
@@ -37,12 +37,11 @@ public abstract class BaseEditStepHandler<T> implements ConversationStepHandler 
     private final PeriodFormatter periodFormatter;
 
     protected BaseEditStepHandler(
-            ConversationStateService stateService,
-            LocalMessageService messageService,
-            KeyboardService keyboardService,
-            TelegramApiClient telegramApiClient,
-            PeriodFormatter periodFormatter
-    ) {
+                                  ConversationStateService stateService,
+                                  LocalMessageService messageService,
+                                  KeyboardService keyboardService,
+                                  TelegramApiClient telegramApiClient,
+                                  PeriodFormatter periodFormatter) {
         this.stateService = stateService;
         this.messageService = messageService;
         this.keyboardService = keyboardService;
@@ -52,6 +51,7 @@ public abstract class BaseEditStepHandler<T> implements ConversationStepHandler 
 
     /**
      * Парсит и валидирует текстовый ввод от пользователя.
+     * 
      * @param text Входной текст.
      * @return Распарсенное и провалидированное значение типа T.
      * @throws InvalidInputException если ввод некорректен.
@@ -60,8 +60,9 @@ public abstract class BaseEditStepHandler<T> implements ConversationStepHandler 
 
     /**
      * Обновляет соответствующее поле в объекте Subscription.
+     * 
      * @param subscription Объект подписки для обновления.
-     * @param value Значение, которое нужно установить.
+     * @param value        Значение, которое нужно установить.
      */
     protected abstract void updateSubscription(Subscription subscription, T value);
 
@@ -76,35 +77,28 @@ public abstract class BaseEditStepHandler<T> implements ConversationStepHandler 
 
             return stateService.getContext(userId, SubscriptionContext.class)
                     .flatMap(context -> {
-                        Mono<Void> sideEffects = performSideEffects(context, userId, messageId, subscription ->
-                                updateSubscription(subscription, parsedValue));
+                        Mono<Void> sideEffects = performSideEffects(context, userId, messageId,
+                                subscription -> updateSubscription(subscription, parsedValue));
 
                         return sideEffects.thenReturn(context);
                     })
-                    .map(context ->
-                            createEditMessage(userId, context)
-                    );
-
+                    .map(context -> createEditMessage(userId, context));
         } catch (InvalidInputException e) {
             return Mono.just(new SendMessage(
                     userId.toString(),
-                    messageService.getMessage(e.getMessageCode())
-            ));
-
+                    messageService.getMessage(e.getMessageCode())));
         } catch (Exception e) {
             return Mono.just(new SendMessage(
                     userId.toString(),
-                    messageService.getMessage("error.unexpected")
-            ));
+                    messageService.getMessage("error.unexpected")));
         }
     }
 
     private Mono<Void> performSideEffects(
-            SubscriptionContext context,
-            Long userId,
-            Integer messageId,
-            Consumer<Subscription> subscriptionUpdater
-    ) {
+                                          SubscriptionContext context,
+                                          Long userId,
+                                          Integer messageId,
+                                          Consumer<Subscription> subscriptionUpdater) {
         Mono<Void> deleteUserMessageMono = telegramApiClient.deleteMessage(userId, messageId);
 
         subscriptionUpdater.accept(context.getSubscription());
@@ -124,8 +118,7 @@ public abstract class BaseEditStepHandler<T> implements ConversationStepHandler 
                 subscription.getPaymentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
                 subscription.getCurrency(),
                 subscription.getCategory(),
-                periodFormatter.format(subscription.getRenewalMonths())
-        );
+                periodFormatter.format(subscription.getRenewalMonths()));
 
         InlineKeyboardMarkup keyboard = subscription.getId() == null
                 ? keyboardService.getConfirmationKeyboard()

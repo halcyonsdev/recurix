@@ -6,6 +6,9 @@ import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.service.SubscriptionService;
 import com.halcyon.recurix.support.PayloadEncoder;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,10 +17,6 @@ import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Component
 @RequiredArgsConstructor
@@ -63,25 +62,22 @@ public class ViewCommand implements BotCommand {
                     "User {} executed /view command for subscription ID {} from page {}.",
                     update.getMessage().getFrom().getId(),
                     payload.subscriptionId(),
-                    payload.pageNumber()
-            );
+                    payload.pageNumber());
 
             return Mono.when(
-                            telegramApiClient.deleteMessage(chatId, payload.messageId()),
-                            telegramApiClient.deleteMessage(chatId, commandMessageId)
-                    )
+                    telegramApiClient.deleteMessage(chatId, payload.messageId()),
+                    telegramApiClient.deleteMessage(chatId, commandMessageId))
                     .then(subscriptionService.findById(payload.subscriptionId())
                             .map(subscription -> SendMessage.builder()
                                     .chatId(chatId)
                                     .text(subscriptionMessageFactory.formatSubscriptionDetail(subscription))
                                     .parseMode(ParseMode.MARKDOWN)
-                                    .replyMarkup(keyboardService.getSubscriptionDetailKeyboard(payload.subscriptionId(), payload.pageNumber()))
+                                    .replyMarkup(keyboardService.getSubscriptionDetailKeyboard(payload.subscriptionId(),
+                                            payload.pageNumber()))
                                     .build())
-                            .switchIfEmpty(Mono.fromCallable(() ->
-                                    new SendMessage(chatId.toString(), messageService.getMessage("subscription.not_found"))
-                            ))
+                            .switchIfEmpty(Mono.fromCallable(() -> new SendMessage(chatId.toString(),
+                                    messageService.getMessage("subscription.not_found"))))
                             .map(sendMessage -> sendMessage));
-
         } catch (IllegalArgumentException e) {
             log.error("Failed to decode view command payload: {}", commandText, e);
             return Mono.just(new SendMessage(chatId.toString(), "Некорректная или устаревшая команда."));

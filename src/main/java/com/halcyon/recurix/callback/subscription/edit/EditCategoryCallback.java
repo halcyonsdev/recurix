@@ -5,12 +5,11 @@ import com.halcyon.recurix.handler.ConversationState;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
+import java.io.Serializable;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обработчик callback-запроса для начала редактирования категории подписки.
@@ -24,7 +23,9 @@ import java.io.Serializable;
 @Component
 public class EditCategoryCallback extends BaseEditCallback {
 
-    protected EditCategoryCallback(ConversationStateService stateService, LocalMessageService messageService, KeyboardService keyboardService) {
+    protected EditCategoryCallback(ConversationStateService stateService,
+                                   LocalMessageService messageService,
+                                   KeyboardService keyboardService) {
         super(stateService, messageService, keyboardService);
     }
 
@@ -39,12 +40,14 @@ public class EditCategoryCallback extends BaseEditCallback {
      * Вызывает общую логику из {@link BaseEditCallback#sendEditMessage}, передавая
      * параметры, специфичные для изменения категории:
      * <ul>
-     *     <li>Ключ сообщения с запросом новой категории ({@code "dialog.add.edit.category"}).</li>
-     *     <li>Следующее состояние диалога ({@link ConversationState#AWAITING_NEW_CATEGORY}).</li>
+     * <li>Ключ сообщения с запросом новой категории ({@code "dialog.add.edit.category"}).</li>
+     * <li>Следующее состояние диалога ({@link ConversationState#AWAITING_NEW_CATEGORY}).</li>
      * </ul>
      *
      * @param update объект с данными от Telegram.
-     * @return {@code Mono} с готовым {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText} для отправки пользователю.
+     * @return {@code Mono} с готовым
+     *             {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText}
+     *             для отправки пользователю.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
@@ -52,7 +55,6 @@ public class EditCategoryCallback extends BaseEditCallback {
                 update,
                 "dialog.add.edit.category",
                 ConversationState.AWAITING_NEW_CATEGORY,
-                keyboardService.getBackToEditKeyboard()
-        );
+                keyboardService.getBackToEditKeyboard());
     }
 }

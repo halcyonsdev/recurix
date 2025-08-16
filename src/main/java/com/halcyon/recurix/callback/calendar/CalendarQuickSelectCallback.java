@@ -3,6 +3,9 @@ package com.halcyon.recurix.callback.calendar;
 import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
 import com.halcyon.recurix.service.KeyboardService;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,10 +14,6 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageRe
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.YearMonth;
 
 /**
  * Обработчик нажатий на кнопки быстрого выбора периода (+1 месяц, +6 месяцев, +1 год).
@@ -39,13 +38,13 @@ public class CalendarQuickSelectCallback implements Callback {
      * <p>
      * Логика определения базовой даты:
      * <ul>
-     *     <li>Если пользователь уже выбрал дату в календаре, она используется как точка отсчета.</li>
-     *     <li>Если дата не была выбрана, точкой отсчета становится {@link LocalDate#now()}.</li>
+     * <li>Если пользователь уже выбрал дату в календаре, она используется как точка отсчета.</li>
+     * <li>Если дата не была выбрана, точкой отсчета становится {@link LocalDate#now()}.</li>
      * </ul>
      *
      * @param update Входящий объект {@link Update} от Telegram.
      * @return {@code Mono} с объектом {@link EditMessageReplyMarkup}, содержащим только
-     *         обновленную клавиатуру
+     *             обновленную клавиатуру
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
@@ -59,7 +58,9 @@ public class CalendarQuickSelectCallback implements Callback {
         }
 
         String period = parts[0];
-        LocalDate baseDate = parts[1].isEmpty() ? LocalDate.now() : LocalDate.parse(parts[1]);
+        LocalDate baseDate = parts[1].isEmpty()
+                ? LocalDate.now()
+                : LocalDate.parse(parts[1]);
         String backCallbackData = parts[2];
 
         LocalDate newSelectedDate = switch (period) {
@@ -75,7 +76,8 @@ public class CalendarQuickSelectCallback implements Callback {
         return Mono.fromCallable(() -> EditMessageReplyMarkup.builder()
                 .chatId(callbackQuery.getMessage().getChatId())
                 .messageId(callbackQuery.getMessage().getMessageId())
-                .replyMarkup(keyboardService.getCalendarKeyboard(YearMonth.from(newSelectedDate), newSelectedDate, backCallbackData))
+                .replyMarkup(
+                        keyboardService.getCalendarKeyboard(YearMonth.from(newSelectedDate), newSelectedDate, backCallbackData))
                 .build());
     }
 }

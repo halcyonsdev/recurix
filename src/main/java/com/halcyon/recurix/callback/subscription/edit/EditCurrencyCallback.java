@@ -5,19 +5,19 @@ import com.halcyon.recurix.handler.ConversationState;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
+import java.io.Serializable;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
 
-import java.io.Serializable;
-
 /**
  * Обрабатывает нажатие на кнопку "Изменить валюту" в меню редактирования.
  * <p>
  * Этот класс не устанавливает состояние ожидания текстового ввода.
- * Вместо этого он отправляет пользователю сообщение с инлайн-клавиатурой для выбора одной из доступных валют.
+ * Вместо этого он отправляет пользователю сообщение с инлайн-клавиатурой для выбора одной из
+ * доступных валют.
  *
  * @see BaseEditCallback
  * @see ChooseCurrencyCallback
@@ -25,7 +25,9 @@ import java.io.Serializable;
 @Component
 public class EditCurrencyCallback extends BaseEditCallback {
 
-    public EditCurrencyCallback(ConversationStateService stateService, LocalMessageService messageService, KeyboardService keyboardService) {
+    public EditCurrencyCallback(ConversationStateService stateService,
+                                LocalMessageService messageService,
+                                KeyboardService keyboardService) {
         super(stateService, messageService, keyboardService);
     }
 
@@ -49,7 +51,6 @@ public class EditCurrencyCallback extends BaseEditCallback {
                 update,
                 "dialog.add.edit.currency",
                 ConversationState.AWAITING_NEW_CURRENCY,
-                keyboardService.getCurrencySelectionKeyboard()
-        );
+                keyboardService.getCurrencySelectionKeyboard());
     }
 }

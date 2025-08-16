@@ -10,6 +10,7 @@ import com.halcyon.recurix.service.SubscriptionService;
 import com.halcyon.recurix.service.UserService;
 import com.halcyon.recurix.service.pagination.PaginationConstants;
 import com.halcyon.recurix.support.SubscriptionMessageFactory;
+import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -20,8 +21,6 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * Обработчик callback-запроса для отмены процесса добавления подписки.
@@ -51,14 +50,16 @@ public class CancelSubscriptionCallback implements Callback {
      * <p>
      * Метод выполняет следующие действия в реактивной последовательности:
      * <ol>
-     *     <li>Отправляет пользователю всплывающее уведомление о том, что операция отменена.</li>
-     *     <li>Полностью очищает состояние и контекст диалога пользователя в Redis.</li>
-     *     <li>Загружает актуальный список всех подписок пользователя.</li>
-     *     <li>Удаляет прошлое сообщение и отправляет первую страницу списка подписок.</li>
+     * <li>Отправляет пользователю всплывающее уведомление о том, что операция отменена.</li>
+     * <li>Полностью очищает состояние и контекст диалога пользователя в Redis.</li>
+     * <li>Загружает актуальный список всех подписок пользователя.</li>
+     * <li>Удаляет прошлое сообщение и отправляет первую страницу списка подписок.</li>
      * </ol>
      *
      * @param update Объект, содержащий callback-запрос от пользователя.
-     * @return {@code Mono} с объектом {@link org.telegram.telegrambots.meta.api.methods.send.SendMessage} со списком подписок.
+     * @return {@code Mono} с объектом
+     *             {@link org.telegram.telegrambots.meta.api.methods.send.SendMessage} со списком
+     *             подписок.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
@@ -73,15 +74,14 @@ public class CancelSubscriptionCallback implements Callback {
                 .then(userService.findOrCreateUser(telegramUser));
 
         return telegramApiClient.sendAnswerCallbackQuery(
-                        callbackQuery.getId(),
-                        messageService.getMessage("dialog.confirm.cancelled")
-                )
+                callbackQuery.getId(),
+                messageService.getMessage("dialog.confirm.cancelled"))
                 .then(telegramApiClient.deleteMessage(chatId, messageId))
                 .then(userMono.flatMap(user -> {
-                    Pageable pageable = PageRequest.of(0, PaginationConstants.DEFAULT_PAGE_SIZE, PaginationConstants.DEFAULT_SORT);
+                    Pageable pageable = PageRequest.of(0, PaginationConstants.DEFAULT_PAGE_SIZE,
+                            PaginationConstants.DEFAULT_SORT);
                     return subscriptionService.getSubscriptionsAsPage(user.id(), pageable);
                 }))
                 .map(page -> subscriptionMessageFactory.createNewSubscriptionsPageMessage(chatId, messageId, page));
     }
-
 }

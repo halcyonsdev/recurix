@@ -1,11 +1,10 @@
 package com.halcyon.recurix.service;
 
+import java.util.Arrays;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +21,9 @@ public class LocalMessageService {
         String notSpecifiedPlaceholder = messageSource.getMessage("placeholder.not_specified", null, locale);
 
         Object[] processedArgs = Arrays.stream(args)
-                .map(arg -> (arg == null ? notSpecifiedPlaceholder : arg))
+                .map(arg -> (arg == null
+                        ? notSpecifiedPlaceholder
+                        : arg))
                 .toArray();
 
         return messageSource.getMessage(code, processedArgs, locale);

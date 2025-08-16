@@ -3,13 +3,12 @@ package com.halcyon.recurix.service;
 import com.halcyon.recurix.model.Subscription;
 import com.halcyon.recurix.repository.SubscriptionRepository;
 import com.halcyon.recurix.service.pagination.Page;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +34,8 @@ public class SubscriptionService {
 
     /**
      * Централизованно получает страницу подписок для пользователя.
-     * @param userId ID пользователя.
+     * 
+     * @param userId   ID пользователя.
      * @param pageable Объект с информацией о странице, размере и сортировке.
      * @return Mono с объектом Page.
      */
@@ -45,7 +45,9 @@ public class SubscriptionService {
 
         return Mono.zip(contentMono, totalElementsMono, (content, total) -> {
             int pageSize = pageable.getPageSize();
-            int totalPages = (total == 0) ? 1 : (int) Math.ceil((double) total / pageSize);
+            int totalPages = (total == 0)
+                    ? 1
+                    : (int) Math.ceil((double) total / pageSize);
             return new Page<>(content, pageable.getPageNumber(), totalPages, total);
         });
     }

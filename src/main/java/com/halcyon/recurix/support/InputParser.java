@@ -1,12 +1,11 @@
 package com.halcyon.recurix.support;
 
 import com.halcyon.recurix.exception.*;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import org.springframework.stereotype.Component;
 
 /**
  * Утилитарный компонент для парсинга и валидации пользовательского ввода.
@@ -21,9 +20,10 @@ public class InputParser {
 
     /**
      * Парсит и валидирует строку для получения цены.
+     * 
      * @param text Входной текст от пользователя.
      * @return цена BigDecimal.
-     * @throws InvalidPriceException если текст имеет неверный числовой формат.
+     * @throws InvalidPriceException  если текст имеет неверный числовой формат.
      * @throws NegativePriceException если цена является отрицательным числом.
      */
     public BigDecimal parsePrice(String text) throws InvalidPriceException, NegativePriceException {
@@ -44,10 +44,11 @@ public class InputParser {
 
     /**
      * Парсит и валидирует строку для получения даты.
+     * 
      * @param text Входной текст от пользователя.
      * @return дата LocalDate.
      * @throws InvalidDateException если текст имеет неверный формат даты.
-     * @throws DateInPastException если дата находится в прошлом.
+     * @throws DateInPastException  если дата находится в прошлом.
      */
     public LocalDate parseDate(String text) throws InvalidDateException, DateInPastException {
         if (text == null) {
@@ -66,6 +67,7 @@ public class InputParser {
 
     /**
      * Парсит и валидирует строку для получения периода.
+     * 
      * @param text Входной текст от пользователя.
      * @return количество месяцев.
      * @throws InvalidPeriodMonthsException если текст имеет неверный числовой формат.
@@ -82,7 +84,6 @@ public class InputParser {
             }
 
             return months;
-
         } catch (NumberFormatException e) {
             throw new InvalidPeriodMonthsException();
         }
