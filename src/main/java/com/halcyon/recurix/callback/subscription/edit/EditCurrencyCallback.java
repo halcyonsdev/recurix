@@ -1,11 +1,13 @@
-package com.halcyon.recurix.callback.subscription.add.edit;
+package com.halcyon.recurix.callback.subscription.edit;
 
 import com.halcyon.recurix.callback.CallbackData;
+import com.halcyon.recurix.handler.ConversationState;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
 
@@ -35,17 +37,18 @@ public class EditCurrencyCallback extends BaseEditCallback {
     /**
      * {@inheritDoc}
      * <p>
-     * Вызывает общую логику из {@link BaseEditCallback#sendEditRequestWithCustomKeyboard},
+     * Вызывает общую логику из {@link BaseEditCallback#sendEditMessage},
      * чтобы отправить пользователю сообщение с инлайн-клавиатурой для выбора валюты.
      *
      * @param update объект с данными от Telegram.
-     * @return {@code Mono} с готовым {@link org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText} для отправки пользователю.
+     * @return {@code Mono} с готовым {@link EditMessageText} для отправки пользователю.
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
-        return sendEditRequestWithCustomKeyboard(
+        return sendEditMessage(
                 update,
                 "dialog.add.edit.currency",
+                ConversationState.AWAITING_NEW_CURRENCY,
                 keyboardService.getCurrencySelectionKeyboard()
         );
     }

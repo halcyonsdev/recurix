@@ -90,7 +90,7 @@ public class KeyboardService {
                 .build();
     }
 
-    public InlineKeyboardMarkup getEditKeyboard() {
+    public InlineKeyboardMarkup getEditKeyboard(String backCallbackData) {
         var editNameButton = InlineKeyboardButton.builder()
                 .text(messageService.getMessage("dialog.button.edit.name"))
                 .callbackData(EDIT_NAME)
@@ -118,7 +118,7 @@ public class KeyboardService {
 
         var backToConfirmationButton = InlineKeyboardButton.builder()
                 .text(messageService.getMessage("dialog.button.back"))
-                .callbackData(BACK_TO_CONFIRMATION)
+                .callbackData(backCallbackData)
                 .build();
 
         return InlineKeyboardMarkup.builder()
@@ -368,10 +368,10 @@ public class KeyboardService {
      * @return Список {@link InlineKeyboardButton}, представляющий ряд сортировки.
      */
     private List<InlineKeyboardButton> createSortingRow(int currentPage, SubscriptionListContext context) {
-        String dateSortText = messageService.getMessage("button.sort_by_date") +
+        String dateSortText = messageService.getMessage("subscription.button.sort_by_date") +
                 ("paymentDate".equals(context.sortField()) && context.sortDirection() == Sort.Direction.ASC ? " ⬇️" : " ⬆️");
 
-        String priceSortText = messageService.getMessage("button.sort_by_price") +
+        String priceSortText = messageService.getMessage("subscription.button.sort_by_price") +
                 ("price".equals(context.sortField()) && context.sortDirection() == Sort.Direction.ASC ? " ⬇️" : " ⬆️");
 
         var sortByDateButton = InlineKeyboardButton.builder()
@@ -411,13 +411,71 @@ public class KeyboardService {
      * @return Инлайн-клавиатура с кнопками действий.
      */
     public InlineKeyboardMarkup getSubscriptionDetailKeyboard(Long subscriptionId, int pageNumber) {
+        var editButton = InlineKeyboardButton.builder()
+                .text(messageService.getMessage("subscription.button.edit"))
+                .callbackData(SUB_EDIT_DETAIL_PREFIX + subscriptionId + "_" + pageNumber)
+                .build();
+
+        var deleteButton = InlineKeyboardButton.builder()
+                .text(messageService.getMessage("subscription.button.delete"))
+                .callbackData(SUB_DELETE_CONFIRM_PREFIX + subscriptionId + "_" + pageNumber)
+                .build();
+
         var backToListButton = InlineKeyboardButton.builder()
                 .text(messageService.getMessage("subscriptions.list.back"))
                 .callbackData(SUB_LIST_PAGE_PREFIX + pageNumber)
                 .build();
 
         return InlineKeyboardMarkup.builder()
+                .keyboardRow(List.of(editButton, deleteButton))
                 .keyboardRow(List.of(backToListButton))
+                .build();
+    }
+
+    /**
+     * Создает клавиатуру для подтверждения изменений после редактирования.
+     *
+     * @param subscriptionId ID подписки.
+     * @param pageNumber Номер страницы для возврата.
+     * @return Инлайн-клавиатура.
+     */
+    public InlineKeyboardMarkup getEditConfirmationKeyboard(Long subscriptionId, int pageNumber) {
+        var updateButton = InlineKeyboardButton.builder()
+                .text(messageService.getMessage("subscription.button.save"))
+                .callbackData(SUB_UPDATE_AND_VIEW_PREFIX + subscriptionId + "_" + pageNumber)
+                .build();
+
+        var cancelButton = InlineKeyboardButton.builder()
+                .text(messageService.getMessage("subscription.button.cancel"))
+                .callbackData(SUB_CANCEL_EDIT_AND_VIEW_PREFIX + subscriptionId + "_" + pageNumber)
+                .build();
+
+        return InlineKeyboardMarkup.builder()
+                .keyboardRow(List.of(updateButton))
+                .keyboardRow(List.of(cancelButton))
+                .build();
+    }
+
+    /**
+     * Создает клавиатуру для подтверждения удаления подписки.
+     *
+     * @param subscriptionId ID подписки.
+     * @param pageNumber Номер страницы для возврата.
+     * @return Клавиатура с кнопками "Да" и "Нет".
+     */
+    public InlineKeyboardMarkup getDeleteConfirmationKeyboard(Long subscriptionId, int pageNumber) {
+        var confirmButton = InlineKeyboardButton.builder()
+                .text(messageService.getMessage("dialog.button.delete.confirm"))
+                .callbackData(SUB_DELETE_EXECUTE_PREFIX + subscriptionId + "_" + pageNumber)
+                .build();
+
+        var cancelButton = InlineKeyboardButton.builder()
+                .text(messageService.getMessage("dialog.button.delete.cancel"))
+                .callbackData(SUB_VIEW_PREFIX + subscriptionId + "_" + pageNumber)
+                .build();
+
+        return InlineKeyboardMarkup.builder()
+                .keyboardRow(List.of(confirmButton, cancelButton))
                 .build();
     }
 }

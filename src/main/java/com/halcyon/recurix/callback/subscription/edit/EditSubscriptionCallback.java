@@ -1,4 +1,4 @@
-package com.halcyon.recurix.callback.subscription.add.edit;
+package com.halcyon.recurix.callback.subscription.edit;
 
 import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
@@ -62,7 +62,7 @@ public class EditSubscriptionCallback implements Callback {
                         userId,
                         messageId,
                         context.getSubscription(),
-                        keyboardService.getEditKeyboard()
+                        keyboardService.getEditKeyboard(CallbackData.BACK_TO_CONFIRMATION)
                 ));
     }
 }

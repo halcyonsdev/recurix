@@ -37,4 +37,11 @@ public final class CallbackData {
     public static final String SUB_LIST_PAGE_PREFIX = "sub_list_page_";
     public static final String SUB_VIEW_PREFIX = "sub_view_";
     public static final String SUB_SORT_PREFIX = "sub_sort_";
+
+    public static final String SUB_EDIT_DETAIL_PREFIX = "sub_edit_detail_";
+    public static final String SUB_DELETE_CONFIRM_PREFIX = "sub_del_confirm_";
+    public static final String SUB_DELETE_EXECUTE_PREFIX = "sub_del_exec_";
+    public static final String SUB_UPDATE_AND_VIEW_PREFIX = "sub_update_and_view_";
+    public static final String SUB_CANCEL_EDIT_AND_VIEW_PREFIX = "sub_cancel_edit_and_view_";
+    public static final String SUB_BACK_TO_VIEW_PREFIX = "sub_back_to_view_";
 }

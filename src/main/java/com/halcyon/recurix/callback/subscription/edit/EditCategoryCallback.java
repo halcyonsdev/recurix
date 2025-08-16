@@ -1,4 +1,4 @@
-package com.halcyon.recurix.callback.subscription.add.edit;
+package com.halcyon.recurix.callback.subscription.edit;
 
 import com.halcyon.recurix.callback.CallbackData;
 import com.halcyon.recurix.handler.ConversationState;
@@ -48,6 +48,11 @@ public class EditCategoryCallback extends BaseEditCallback {
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
-        return sendEditMessage(update, "dialog.add.edit.category", ConversationState.AWAITING_NEW_CATEGORY);
+        return sendEditMessage(
+                update,
+                "dialog.add.edit.category",
+                ConversationState.AWAITING_NEW_CATEGORY,
+                keyboardService.getBackToEditKeyboard()
+        );
     }
 }

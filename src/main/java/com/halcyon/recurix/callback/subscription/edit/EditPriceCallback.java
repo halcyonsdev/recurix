@@ -1,11 +1,11 @@
-package com.halcyon.recurix.callback.subscription.add.edit;
+package com.halcyon.recurix.callback.subscription.edit;
 
 import com.halcyon.recurix.callback.CallbackData;
+import com.halcyon.recurix.handler.ConversationState;
 import com.halcyon.recurix.handler.subscription.edit.EditPriceStepHandler;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
-import com.halcyon.recurix.handler.ConversationState;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -49,6 +49,11 @@ public class EditPriceCallback extends BaseEditCallback {
      */
     @Override
     public Mono<BotApiMethod<? extends Serializable>> execute(Update update) {
-        return sendEditMessage(update, "dialog.add.edit.price", ConversationState.AWAITING_NEW_PRICE);
+        return sendEditMessage(
+                update,
+                "dialog.add.edit.price",
+                ConversationState.AWAITING_NEW_PRICE,
+                keyboardService.getBackToEditKeyboard()
+        );
     }
 }

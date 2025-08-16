@@ -1,7 +1,8 @@
-package com.halcyon.recurix.callback.subscription.add.edit;
+package com.halcyon.recurix.callback.subscription.edit;
 
 import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
+import com.halcyon.recurix.model.Subscription;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
@@ -13,6 +14,7 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
@@ -67,12 +69,19 @@ public class ChooseCurrencyCallback implements Callback {
                     context.getSubscription().setCurrency(currency);
                     return stateService.setContext(userId, context).thenReturn(context);
                 })
-                .map(updatedContext -> subscriptionMessageFactory.createEditMessage(
-                        userId,
-                        messageId,
-                        updatedContext.getSubscription(),
-                        keyboardService.getConfirmationKeyboard()
-                ));
+                .map(updatedContext -> {
+                    Subscription subscription = updatedContext.getSubscription();
+                    InlineKeyboardMarkup confirmationKeyboard = subscription.getId() == null
+                            ? keyboardService.getConfirmationKeyboard()
+                            : keyboardService.getEditConfirmationKeyboard(subscription.getId(), updatedContext.getPageNumber());
+
+                    return subscriptionMessageFactory.createEditMessage(
+                            userId,
+                            messageId,
+                            updatedContext.getSubscription(),
+                            confirmationKeyboard
+                    );
+                });
     }
 
 }

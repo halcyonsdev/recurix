@@ -53,4 +53,8 @@ public class SubscriptionService {
     private Flux<Subscription> getAllByUserId(Long userId, Pageable pageable) {
         return subscriptionRepository.findAllByUserId(userId, pageable);
     }
+
+    public Mono<Void> deleteById(long subscriptionId) {
+        return subscriptionRepository.deleteById(subscriptionId);
+    }
 }

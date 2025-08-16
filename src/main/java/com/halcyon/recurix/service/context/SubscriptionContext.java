@@ -12,8 +12,14 @@ public class SubscriptionContext {
 
     private Subscription subscription;
     private Integer messageToEditId;
+    private Integer pageNumber;
 
     public SubscriptionContext(Subscription subscription) {
         this.subscription = subscription;
+    }
+
+    public SubscriptionContext(Subscription subscription, Integer messageToEditId) {
+        this.subscription = subscription;
+        this.messageToEditId = messageToEditId;
     }
 }

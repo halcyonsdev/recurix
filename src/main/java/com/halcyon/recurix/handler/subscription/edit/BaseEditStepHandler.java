@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
@@ -74,10 +75,10 @@ public abstract class BaseEditStepHandler<T> implements ConversationStepHandler 
                         Mono<Void> sideEffects = performSideEffects(context, userId, messageId, subscription ->
                                 updateSubscription(subscription, parsedValue));
 
-                        return sideEffects.thenReturn(new Result(context.getSubscription(), context.getMessageToEditId()));
+                        return sideEffects.thenReturn(context);
                     })
-                    .map(result ->
-                            createEditMessage(userId, result.subscription, result.messageToEditId)
+                    .map(context ->
+                            createEditMessage(userId, context)
                     );
 
         } catch (InvalidInputException e) {
@@ -110,7 +111,8 @@ public abstract class BaseEditStepHandler<T> implements ConversationStepHandler 
         return Mono.when(deleteUserMessageMono, saveContextMono, clearStateMono);
     }
 
-    private EditMessageText createEditMessage(Long userId, Subscription subscription, Integer messageToEditId) {
+    private EditMessageText createEditMessage(Long userId, SubscriptionContext context) {
+        Subscription subscription = context.getSubscription();
         String summary = messageService.getMessage(
                 "dialog.add.prompt.confirmation",
                 subscription.getName(),
@@ -120,14 +122,16 @@ public abstract class BaseEditStepHandler<T> implements ConversationStepHandler 
                 subscription.getCategory()
         );
 
+        InlineKeyboardMarkup keyboard = subscription.getId() == null
+                ? keyboardService.getConfirmationKeyboard()
+                : keyboardService.getEditConfirmationKeyboard(subscription.getId(), context.getPageNumber());
+
         return EditMessageText.builder()
                 .chatId(userId.toString())
-                .messageId(messageToEditId)
+                .messageId(context.getMessageToEditId())
                 .text(summary)
                 .parseMode(ParseMode.MARKDOWN)
-                .replyMarkup(keyboardService.getConfirmationKeyboard())
+                .replyMarkup(keyboard)
                 .build();
     }
-
-    private record Result(Subscription subscription, Integer messageToEditId) {}
 }
