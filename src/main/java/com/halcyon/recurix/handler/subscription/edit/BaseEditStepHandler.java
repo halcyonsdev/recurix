@@ -8,6 +8,7 @@ import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
+import com.halcyon.recurix.support.PeriodFormatter;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -33,17 +34,20 @@ public abstract class BaseEditStepHandler<T> implements ConversationStepHandler 
     private final LocalMessageService messageService;
     private final KeyboardService keyboardService;
     private final TelegramApiClient telegramApiClient;
+    private final PeriodFormatter periodFormatter;
 
     protected BaseEditStepHandler(
             ConversationStateService stateService,
             LocalMessageService messageService,
             KeyboardService keyboardService,
-            TelegramApiClient telegramApiClient
+            TelegramApiClient telegramApiClient,
+            PeriodFormatter periodFormatter
     ) {
         this.stateService = stateService;
         this.messageService = messageService;
         this.keyboardService = keyboardService;
         this.telegramApiClient = telegramApiClient;
+        this.periodFormatter = periodFormatter;
     }
 
     /**
@@ -119,7 +123,8 @@ public abstract class BaseEditStepHandler<T> implements ConversationStepHandler 
                 subscription.getPrice(),
                 subscription.getPaymentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
                 subscription.getCurrency(),
-                subscription.getCategory()
+                subscription.getCategory(),
+                periodFormatter.format(subscription.getRenewalMonths())
         );
 
         InlineKeyboardMarkup keyboard = subscription.getId() == null

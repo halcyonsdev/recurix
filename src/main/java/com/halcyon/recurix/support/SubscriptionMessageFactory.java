@@ -28,6 +28,7 @@ public class SubscriptionMessageFactory {
     private final LocalMessageService messageService;
     private final KeyboardService keyboardService;
     private final PayloadEncoder payloadEncoder;
+    private final PeriodFormatter periodFormatter;
 
     private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder()
             .appendValue(ChronoField.DAY_OF_MONTH)
@@ -49,7 +50,8 @@ public class SubscriptionMessageFactory {
                 subscription.getPrice(),
                 subscription.getPaymentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
                 subscription.getCurrency(),
-                subscription.getCategory()
+                subscription.getCategory(),
+                periodFormatter.format(subscription.getRenewalMonths())
         );
 
         return EditMessageText.builder()
@@ -128,7 +130,8 @@ public class SubscriptionMessageFactory {
                 subscription.getPrice(),
                 subscription.getCurrency(),
                 subscription.getPaymentDate().format(DATE_FORMATTER),
-                subscription.getCategory()
+                subscription.getCategory(),
+                periodFormatter.format(subscription.getRenewalMonths())
         );
     }
 }

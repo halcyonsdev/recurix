@@ -13,14 +13,15 @@ CREATE INDEX IF NOT EXISTS idx_users_telegram_id ON users (telegram_id);
 
 CREATE TABLE IF NOT EXISTS subscriptions
 (
-    id           BIGINT PRIMARY KEY DEFAULT nextval('subscriptions_id_seq'),
-    user_id      BIGINT NOT NULL,
-    name         VARCHAR(255) NOT NULL,
-    price        DECIMAL(10, 2) NOT NULL,
-    currency     VARCHAR(3) NOT NULL,
-    payment_date DATE NOT NULL,
-    category     VARCHAR(100),
-    created_at   TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    id             BIGINT PRIMARY KEY DEFAULT nextval('subscriptions_id_seq'),
+    user_id        BIGINT NOT NULL,
+    name           VARCHAR(255) NOT NULL,
+    price          DECIMAL(10, 2) NOT NULL,
+    currency       VARCHAR(3) NOT NULL,
+    payment_date   DATE NOT NULL,
+    renewal_months INT NOT NULL,
+    category       VARCHAR(100),
+    created_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 
 
     CONSTRAINT fk_subscriptions_user

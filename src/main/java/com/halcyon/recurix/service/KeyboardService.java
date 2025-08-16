@@ -116,6 +116,11 @@ public class KeyboardService {
                 .callbackData(EDIT_CATEGORY)
                 .build();
 
+        var editPeriodButton = InlineKeyboardButton.builder()
+                .text(messageService.getMessage("dialog.button.edit.period"))
+                .callbackData(EDIT_PERIOD)
+                .build();
+
         var backToConfirmationButton = InlineKeyboardButton.builder()
                 .text(messageService.getMessage("dialog.button.back"))
                 .callbackData(backCallbackData)
@@ -124,7 +129,7 @@ public class KeyboardService {
         return InlineKeyboardMarkup.builder()
                 .keyboardRow(List.of(editNameButton, editPriceButton))
                 .keyboardRow(List.of(editDateButton, editCurrencyButton))
-                .keyboardRow(List.of(editCategoryButton))
+                .keyboardRow(List.of(editCategoryButton, editPeriodButton))
                 .keyboardRow(List.of(backToConfirmationButton))
                 .build();
     }
@@ -313,6 +318,34 @@ public class KeyboardService {
                 .build();
 
         return List.of(backButton, applyButton.build());
+    }
+
+    /**
+     * Создает клавиатуру для выбора периода списания (ежемесячно, ежегодно, другой).
+     *
+     * @return Объект {@link InlineKeyboardMarkup} с готовой клавиатурой.
+     */
+    public InlineKeyboardMarkup getPeriodSelectionKeyboard() {
+        var monthlyButton = InlineKeyboardButton.builder()
+                .text("Ежемесячно")
+                .callbackData(PERIOD_SELECT_PREFIX + "1")
+                .build();
+
+        var yearlyButton = InlineKeyboardButton.builder()
+                .text("Ежегодно")
+                .callbackData(PERIOD_SELECT_PREFIX + "12")
+                .build();
+
+        var customButton = InlineKeyboardButton.builder()
+                .text("Другой период...")
+                .callbackData(PERIOD_SELECT_CUSTOM)
+                .build();
+
+        return InlineKeyboardMarkup.builder()
+                .keyboardRow(List.of(monthlyButton, yearlyButton))
+                .keyboardRow(List.of(customButton))
+                .keyboardRow(List.of(getBackToEditButton()))
+                .build();
     }
 
     /**

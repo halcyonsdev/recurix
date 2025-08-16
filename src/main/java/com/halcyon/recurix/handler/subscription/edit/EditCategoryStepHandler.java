@@ -7,13 +7,14 @@ import com.halcyon.recurix.model.Subscription;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
+import com.halcyon.recurix.support.PeriodFormatter;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EditCategoryStepHandler extends BaseEditStepHandler<String> {
 
-    public EditCategoryStepHandler(ConversationStateService stateService, LocalMessageService messageService, KeyboardService keyboardService, TelegramApiClient telegramApiClient) {
-        super(stateService, messageService, keyboardService, telegramApiClient);
+    public EditCategoryStepHandler(ConversationStateService stateService, LocalMessageService messageService, KeyboardService keyboardService, TelegramApiClient telegramApiClient, PeriodFormatter periodFormatter) {
+        super(stateService, messageService, keyboardService, telegramApiClient, periodFormatter);
     }
 
     @Override

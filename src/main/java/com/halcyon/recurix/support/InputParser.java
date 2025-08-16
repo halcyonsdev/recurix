@@ -1,9 +1,6 @@
 package com.halcyon.recurix.support;
 
-import com.halcyon.recurix.exception.DateInPastException;
-import com.halcyon.recurix.exception.InvalidDateException;
-import com.halcyon.recurix.exception.InvalidPriceException;
-import com.halcyon.recurix.exception.NegativePriceException;
+import com.halcyon.recurix.exception.*;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -64,6 +61,30 @@ public class InputParser {
             return date;
         } catch (DateTimeParseException e) {
             throw new InvalidDateException();
+        }
+    }
+
+    /**
+     * Парсит и валидирует строку для получения периода.
+     * @param text Входной текст от пользователя.
+     * @return количество месяцев.
+     * @throws InvalidPeriodMonthsException если текст имеет неверный числовой формат.
+     */
+    public Integer parsePeriodMonths(String text) throws InvalidPeriodMonthsException {
+        if (text == null) {
+            throw new InvalidPeriodMonthsException();
+        }
+
+        try {
+            int months = Integer.parseInt(text);
+            if (months < 0) {
+                throw new InvalidPeriodMonthsException();
+            }
+
+            return months;
+
+        } catch (NumberFormatException e) {
+            throw new InvalidPeriodMonthsException();
         }
     }
 }

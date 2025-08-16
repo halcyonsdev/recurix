@@ -21,6 +21,9 @@ public final class CallbackData {
     public static final String EDIT_DATE = "date_edit";
     public static final String EDIT_CURRENCY = "currency_edit";
     public static final String EDIT_CATEGORY = "category_edit";
+    public static final String EDIT_PERIOD = "period_edit";
+    public static final String PERIOD_SELECT_PREFIX = "sub_period_";
+    public static final String PERIOD_SELECT_CUSTOM = "sub_custom_period";
     public static final String BACK_TO_CONFIRMATION = "back_to_confirmation";
 
     public static final String BACK_TO_EDIT = "back-to-edit";

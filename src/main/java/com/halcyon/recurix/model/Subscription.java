@@ -35,6 +35,9 @@ public class Subscription {
     @Column("payment_date")
     private LocalDate paymentDate;
 
+    @Column("renewal_months")
+    private Integer renewalMonths = 1;
+
     @Column("category")
     private String category;
 }
