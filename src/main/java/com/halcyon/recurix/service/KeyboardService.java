@@ -3,6 +3,7 @@ package com.halcyon.recurix.service;
 import static com.halcyon.recurix.callback.CallbackData.*;
 
 import com.halcyon.recurix.model.Subscription;
+import com.halcyon.recurix.model.UserSettings;
 import com.halcyon.recurix.service.context.SubscriptionListContext;
 import com.halcyon.recurix.service.pagination.Page;
 import java.time.LocalDate;
@@ -525,6 +526,59 @@ public class KeyboardService {
 
         return InlineKeyboardMarkup.builder()
                 .keyboardRow(List.of(confirmButton, cancelButton))
+                .build();
+    }
+
+    /**
+     * Создает клавиатуру для меню настроек.
+     * Динамически отображает текущее состояние настроек.
+     *
+     * @param settings Текущие настройки пользователя.
+     * @return Клавиатура меню настроек.
+     */
+    public InlineKeyboardMarkup getSettingsKeyboard(UserSettings settings) {
+        String statusKey = settings.isRemindersEnabled()
+                ? "settings.status.enabled"
+                : "settings.status.disabled";
+        String statusText = messageService.getMessage(statusKey);
+
+        var toggleButton = InlineKeyboardButton.builder()
+                .text(messageService.getMessage("settings.button.reminders", statusText))
+                .callbackData(SETTINGS_TOGGLE_REMINDERS)
+                .build();
+
+        var day1 = createDayButton(1, settings.getReminderDaysBefore());
+        var day3 = createDayButton(3, settings.getReminderDaysBefore());
+        var day7 = createDayButton(7, settings.getReminderDaysBefore());
+
+        return InlineKeyboardMarkup.builder()
+                .keyboardRow(List.of(toggleButton))
+                .keyboardRow(List.of(day1, day3, day7))
+                .keyboardRow(List.of(getMenuButton()))
+                .build();
+    }
+
+    /**
+     * Создает инлайн-кнопку для выбора количества дней.
+     *
+     * @param days        Количество дней, которое представляет эта кнопка (например, 1, 3, 7).
+     * @param currentDays Текущее выбранное пользователем количество дней.
+     * @return Объект {@link InlineKeyboardButton}, готовый для добавления в клавиатуру.
+     */
+    private InlineKeyboardButton createDayButton(int days, int currentDays) {
+        String selectedChar = (days == currentDays)
+                ? "✅"
+                : " ";
+        String text = String.format(
+                "%s%s %s %s",
+                selectedChar,
+                messageService.getMessage("settings.button.days_prefix"),
+                days,
+                messageService.getMessage("settings.button.days_suffix"));
+
+        return InlineKeyboardButton.builder()
+                .text(text.trim())
+                .callbackData(SETTINGS_CHANGE_DAYS_PREFIX + days)
                 .build();
     }
 }

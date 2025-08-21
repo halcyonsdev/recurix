@@ -24,10 +24,6 @@ public class SubscriptionService {
         return subscriptionRepository.findById(subscriptionId);
     }
 
-    public Flux<Subscription> getAllByUserId(Long userId) {
-        return subscriptionRepository.findAllByUserId(userId);
-    }
-
     public Mono<Integer> countByUserId(Long userId) {
         return subscriptionRepository.countByUserId(userId);
     }

@@ -47,4 +47,7 @@ public final class CallbackData {
     public static final String SUB_UPDATE_AND_VIEW_PREFIX = "sub_update_and_view_";
     public static final String SUB_CANCEL_EDIT_AND_VIEW_PREFIX = "sub_cancel_edit_and_view_";
     public static final String SUB_BACK_TO_VIEW_PREFIX = "sub_back_to_view_";
+
+    public static final String SETTINGS_TOGGLE_REMINDERS = "toggle_reminders";
+    public static final String SETTINGS_CHANGE_DAYS_PREFIX = "change_days_";
 }

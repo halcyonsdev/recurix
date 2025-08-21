@@ -1,5 +1,6 @@
-CREATE SEQUENCE IF NOT EXISTS users_id_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS users_id_seq         START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS subscriptions_id_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS user_settings_id_seq START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE IF NOT EXISTS users
 (
@@ -31,3 +32,15 @@ CREATE TABLE IF NOT EXISTS subscriptions
 );
 
 CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions (user_id);
+
+CREATE TABLE IF NOT EXISTS user_settings (
+    id                   BIGINT  PRIMARY KEY DEFAULT nextval('user_settings_id_seq'),
+    user_id              BIGINT  NOT NULL UNIQUE,
+    reminders_enabled    BOOLEAN NOT NULL DEFAULT TRUE,
+    reminder_days_before INT NOT NULL DEFAULT 3,
+
+    CONSTRAINT fk_user
+        FOREIGN KEY(user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+)
