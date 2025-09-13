@@ -2,11 +2,10 @@ package com.halcyon.recurix.callback.subscription.add;
 
 import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
+import com.halcyon.recurix.message.SubscriptionMessageFactory;
 import com.halcyon.recurix.service.ConversationStateService;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
-import com.halcyon.recurix.support.SubscriptionMessageFactory;
-import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -14,6 +13,8 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
+
+import java.io.Serializable;
 
 /**
  * Обработчик callback-запроса для возврата из меню редактирования на экран подтверждения.

@@ -1,23 +1,25 @@
 package com.halcyon.recurix.service;
 
-import static com.halcyon.recurix.callback.CallbackData.*;
-
 import com.halcyon.recurix.model.Subscription;
 import com.halcyon.recurix.model.UserSettings;
 import com.halcyon.recurix.service.context.SubscriptionListContext;
 import com.halcyon.recurix.service.pagination.Page;
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.format.TextStyle;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+
+import static com.halcyon.recurix.callback.CallbackData.*;
 
 /**
  * Сервис для создания и управления инлайн-клавиатурами.
@@ -579,6 +581,44 @@ public class KeyboardService {
         return InlineKeyboardButton.builder()
                 .text(text.trim())
                 .callbackData(SETTINGS_CHANGE_DAYS_PREFIX + days)
+                .build();
+    }
+
+    /**
+     * Создает клавиатуру для меню аналитики.
+     *
+     * @param yearMonth Текущий отображаемый месяц.
+     * @return Клавиатура с кнопками навигации.
+     */
+    public InlineKeyboardMarkup getAnalyticsKeyboard(YearMonth yearMonth) {
+        YearMonth prevMonth = yearMonth.minusMonths(1);
+        YearMonth nextMonth = yearMonth.plusMonths(1);
+
+        var prevButton = InlineKeyboardButton.builder()
+                .text("⬅️ " + prevMonth.format(DateTimeFormatter.ofPattern("MMM")))
+                .callbackData(ANALYTICS_NAV_PREFIX + prevMonth)
+                .build();
+
+        var thisMonthButton = InlineKeyboardButton.builder()
+                .text(messageService.getMessage("analytics.button.this_month"))
+                .callbackData(IGNORE)
+                .build();
+
+        var nextButton = InlineKeyboardButton.builder()
+                .text(nextMonth.format(DateTimeFormatter.ofPattern("MMM")) + " ➡️")
+                .callbackData(ANALYTICS_NAV_PREFIX + nextMonth)
+                .build();
+
+        // TODO: Добавить логику для кнопки "За весь год"
+        var byYearButton = InlineKeyboardButton.builder()
+                .text(messageService.getMessage("analytics.button.by_year"))
+                .callbackData("analytics_by_year") // Заглушка
+                .build();
+
+        return InlineKeyboardMarkup.builder()
+                .keyboardRow(List.of(prevButton, thisMonthButton, nextButton))
+                .keyboardRow(List.of(byYearButton))
+                .keyboardRow(List.of(getMenuButton()))
                 .build();
     }
 }

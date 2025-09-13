@@ -5,11 +5,10 @@ import com.halcyon.recurix.callback.CallbackData;
 import com.halcyon.recurix.callback.subscription.edit.CancelEditCallback;
 import com.halcyon.recurix.client.TelegramApiClient;
 import com.halcyon.recurix.command.ListCommand;
+import com.halcyon.recurix.message.SubscriptionMessageFactory;
 import com.halcyon.recurix.service.KeyboardService;
 import com.halcyon.recurix.service.LocalMessageService;
 import com.halcyon.recurix.service.SubscriptionService;
-import com.halcyon.recurix.support.SubscriptionMessageFactory;
-import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -19,6 +18,8 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
+
+import java.io.Serializable;
 
 /**
  * Обрабатывает запросы на просмотр детальной информации о подписке.

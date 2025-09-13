@@ -1,7 +1,8 @@
 package com.halcyon.recurix.repository;
 
+import com.halcyon.recurix.dto.CategorySpendingDto;
+import com.halcyon.recurix.dto.ReminderDto;
 import com.halcyon.recurix.model.Subscription;
-import com.halcyon.recurix.repository.mapper.Reminder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Repository
@@ -17,6 +19,12 @@ public interface SubscriptionRepository extends ReactiveCrudRepository<Subscript
     Flux<Subscription> findAllByUserId(Long userId, Pageable pageable);
 
     Mono<Integer> countByUserId(Long userId);
+
+    Flux<Subscription> findAllByPaymentDateBefore(LocalDate date);
+
+    Mono<Subscription> findFirstByUserIdAndPaymentDateBetweenOrderByPriceDesc(Long userId, LocalDate startOfMonth, LocalDate endOfMonth);
+
+    Mono<Subscription> findFirstByUserIdAndPaymentDateGreaterThanEqualOrderByPaymentDateAsc(Long userId, LocalDate fromDate);
 
     @Query("""
         SELECT s.id, s.user_id, s.name, s.price, s.currency,
@@ -27,7 +35,21 @@ public interface SubscriptionRepository extends ReactiveCrudRepository<Subscript
         WHERE us.reminders_enabled = true
         AND s.payment_date = CURRENT_DATE + us.reminder_days_before
     """)
-    Flux<Reminder> findAllForReminding();
+    Flux<ReminderDto> findAllForReminding();
 
-    Flux<Subscription> findAllByPaymentDateBefore(LocalDate date);
+    @Query("""
+        SELECT SUM(price) FROM subscriptions
+        WHERE user_id = :userId
+        AND payment_date BETWEEN :startOfMonth AND :endOfMonth
+    """)
+    Mono<BigDecimal> calculateMonthlyTotal(Long userId, LocalDate startOfMonth, LocalDate endOfMonth);
+
+    @Query("""
+        SELECT category, SUM(price) as total FROM subscriptions
+        WHERE user_id = :userId
+        AND payment_date BETWEEN :startOfMonth AND :endOfMonth
+        GROUP BY category
+        ORDER BY total DESC
+    """)
+    Flux<CategorySpendingDto> findSpendingByCategory(Long userId, LocalDate startOfMonth, LocalDate endOfMonth);
 }

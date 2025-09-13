@@ -3,6 +3,7 @@ package com.halcyon.recurix.callback.subscription.add;
 import com.halcyon.recurix.callback.Callback;
 import com.halcyon.recurix.callback.CallbackData;
 import com.halcyon.recurix.client.TelegramApiClient;
+import com.halcyon.recurix.message.SubscriptionMessageFactory;
 import com.halcyon.recurix.model.RecurixUser;
 import com.halcyon.recurix.model.Subscription;
 import com.halcyon.recurix.service.ConversationStateService;
@@ -11,8 +12,6 @@ import com.halcyon.recurix.service.SubscriptionService;
 import com.halcyon.recurix.service.UserService;
 import com.halcyon.recurix.service.context.SubscriptionContext;
 import com.halcyon.recurix.service.pagination.PaginationConstants;
-import com.halcyon.recurix.support.SubscriptionMessageFactory;
-import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +23,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
+
+import java.io.Serializable;
 
 /**
  * Обработчик callback-запроса для сохранения новой подписки.

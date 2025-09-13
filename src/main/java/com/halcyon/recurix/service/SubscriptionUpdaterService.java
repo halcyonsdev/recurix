@@ -24,7 +24,7 @@ public class SubscriptionUpdaterService {
     /**
      * Запускается ежедневно в 15:00 по МСК для обновления дат "просроченных" подписок.
      */
-    @Scheduled(cron = "0 * 15 * * *", zone = "Europe/Moscow")
+    @Scheduled(cron = "0 0 15 * * *", zone = "Europe/Moscow")
     public void updatePastSubscriptions() {
         log.info("SCHEDULER: Starting daily subscription update task...");
 

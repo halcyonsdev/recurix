@@ -1,8 +1,8 @@
 package com.halcyon.recurix.service;
 
 import com.halcyon.recurix.RecurixBot;
+import com.halcyon.recurix.dto.ReminderDto;
 import com.halcyon.recurix.repository.SubscriptionRepository;
-import com.halcyon.recurix.repository.mapper.Reminder;
 import com.halcyon.recurix.support.PayloadEncoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -44,7 +44,7 @@ public class ReminderService {
     /**
      * Запускается каждый день в 9:00 по московскому времени для отправки напоминаний.
      */
-    @Scheduled(cron = "0 * * * * *", zone = "Europe/Moscow")
+    @Scheduled(cron = "0 0 9 * * *", zone = "Europe/Moscow")
     public void sendDailyReminders() {
         log.info("SCHEDULER: Starting daily reminder task...");
 
@@ -62,23 +62,23 @@ public class ReminderService {
     /**
      * Отправляет сообщение с напоминанием пользователю.
      *
-     * @param reminder объект с данными для напоминания.
+     * @param reminderDto объект с данными для напоминания.
      * @return {@code Mono<Void>}, завершающийся после отправки.
      */
-    private Mono<Void> sendReminderMessage(Reminder reminder) {
-        String payload = payloadEncoder.encode(reminder.id(), 0, 0);
+    private Mono<Void> sendReminderMessage(ReminderDto reminderDto) {
+        String payload = payloadEncoder.encode(reminderDto.id(), 0, 0);
         String viewCommand = "/view_" + payload;
 
         String messageText = messageService.getMessage(
                 "reminder.message",
-                reminder.name(),
-                reminder.price(),
-                reminder.currency(),
+                reminderDto.name(),
+                reminderDto.price(),
+                reminderDto.currency(),
                 viewCommand
         );
 
         var message = SendMessage.builder()
-                .chatId(reminder.telegramId())
+                .chatId(reminderDto.telegramId())
                 .text(messageText)
                 .parseMode(ParseMode.HTML)
                 .build();

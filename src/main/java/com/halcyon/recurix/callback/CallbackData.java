@@ -50,4 +50,6 @@ public final class CallbackData {
 
     public static final String SETTINGS_TOGGLE_REMINDERS = "toggle_reminders";
     public static final String SETTINGS_CHANGE_DAYS_PREFIX = "change_days_";
+
+    public static final String ANALYTICS_NAV_PREFIX = "analytics_nav_";
 }

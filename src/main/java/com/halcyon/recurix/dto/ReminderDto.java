@@ -1,9 +1,9 @@
-package com.halcyon.recurix.repository.mapper;
+package com.halcyon.recurix.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record Reminder(
+public record ReminderDto(
         Long id,
         Long userId,
         String name,
