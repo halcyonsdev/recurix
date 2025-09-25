@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS subscriptions
     user_id        BIGINT NOT NULL,
     name           VARCHAR(255) NOT NULL,
     price          DECIMAL(10, 2) NOT NULL,
-    currency       VARCHAR(3) NOT NULL,
     payment_date   DATE NOT NULL,
     renewal_months INT NOT NULL,
     category       VARCHAR(100),
@@ -34,10 +33,10 @@ CREATE TABLE IF NOT EXISTS subscriptions
 CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions (user_id);
 
 CREATE TABLE IF NOT EXISTS user_settings (
-    id                   BIGINT  PRIMARY KEY DEFAULT nextval('user_settings_id_seq'),
-    user_id              BIGINT  NOT NULL UNIQUE,
-    reminders_enabled    BOOLEAN NOT NULL DEFAULT TRUE,
-    reminder_days_before INT NOT NULL DEFAULT 3,
+    id                   BIGINT     PRIMARY KEY DEFAULT nextval('user_settings_id_seq'),
+    user_id              BIGINT     NOT NULL UNIQUE,
+    reminders_enabled    BOOLEAN    NOT NULL DEFAULT TRUE,
+    reminder_days_before INT        NOT NULL DEFAULT 3,
 
     CONSTRAINT fk_user
         FOREIGN KEY(user_id)

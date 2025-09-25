@@ -30,11 +30,11 @@ public class AnalyticsMessageFactory {
      * @return Готовая строка для отправки в Telegram.
      */
     public String createAnalyticsMessage(AnalyticsDto analyticsDto, YearMonth yearMonth) {
-        if (analyticsDto.monthlyTotal().compareTo(BigDecimal.ZERO) == 0 && analyticsDto.totalSubscriptions() == 0) {
-            return messageService.getMessage("analytics.empty");
-        }
-
         String title = yearMonth.format(MONTH_YEAR_FORMATTER);
+
+        if (analyticsDto.monthlyTotal().compareTo(BigDecimal.ZERO) == 0 && analyticsDto.totalSubscriptions() == 0) {
+            return messageService.getMessage("analytics.month.empty", title);
+        }
 
         return messageService.getMessage("analytics.header", title) + "\n\n" +
                 messageService.getMessage("analytics.total_subscriptions", analyticsDto.totalSubscriptions()) + "\n" +

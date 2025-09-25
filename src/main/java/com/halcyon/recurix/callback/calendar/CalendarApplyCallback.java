@@ -99,7 +99,6 @@ public class CalendarApplyCallback implements Callback {
         subscription.setPaymentDate(selectedDate);
 
         if (subscription.getId() == null) {
-            subscription.setCurrency("RUB");
             return stateService.setContext(userId, context)
                     .thenReturn(stateService.setState(userId, ConversationState.AWAITING_SUBSCRIPTION_CONFIRMATION))
                     .thenReturn(context);

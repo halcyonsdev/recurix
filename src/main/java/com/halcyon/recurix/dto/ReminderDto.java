@@ -8,7 +8,6 @@ public record ReminderDto(
         Long userId,
         String name,
         BigDecimal price,
-        String currency,
         LocalDate paymentDate,
         String category,
         Integer renewalMonths,

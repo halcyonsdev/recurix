@@ -108,11 +108,6 @@ public class KeyboardService {
                 .callbackData(EDIT_DATE)
                 .build();
 
-        var editCurrencyButton = InlineKeyboardButton.builder()
-                .text(messageService.getMessage("dialog.button.edit.currency"))
-                .callbackData(EDIT_CURRENCY)
-                .build();
-
         var editCategoryButton = InlineKeyboardButton.builder()
                 .text(messageService.getMessage("dialog.button.edit.category"))
                 .callbackData(EDIT_CATEGORY)
@@ -130,8 +125,8 @@ public class KeyboardService {
 
         return InlineKeyboardMarkup.builder()
                 .keyboardRow(List.of(editNameButton, editPriceButton))
-                .keyboardRow(List.of(editDateButton, editCurrencyButton))
-                .keyboardRow(List.of(editCategoryButton, editPeriodButton))
+                .keyboardRow(List.of(editDateButton, editCategoryButton))
+                .keyboardRow(List.of(editPeriodButton))
                 .keyboardRow(List.of(backToConfirmationButton))
                 .build();
     }
@@ -146,30 +141,6 @@ public class KeyboardService {
         return InlineKeyboardButton.builder()
                 .text(messageService.getMessage("dialog.button.back"))
                 .callbackData(BACK_TO_EDIT)
-                .build();
-    }
-
-    public InlineKeyboardMarkup getCurrencySelectionKeyboard() {
-        var rubButton = InlineKeyboardButton.builder()
-                .text("RUB (₽)")
-                .callbackData(CURRENCY_SELECT_PREFIX + "RUB")
-                .build();
-
-        var usdButton = InlineKeyboardButton.builder()
-                .text("USD ($)")
-                .callbackData(CURRENCY_SELECT_PREFIX + "USD")
-                .build();
-
-        var eurButton = InlineKeyboardButton.builder()
-                .text("EUR (€)")
-                .callbackData(CURRENCY_SELECT_PREFIX + "EUR")
-                .build();
-
-        return InlineKeyboardMarkup.builder()
-                .keyboardRow(List.of(rubButton))
-                .keyboardRow(List.of(usdButton))
-                .keyboardRow(List.of(eurButton))
-                .keyboardRow(List.of(getBackToEditButton()))
                 .build();
     }
 
@@ -612,7 +583,7 @@ public class KeyboardService {
         // TODO: Добавить логику для кнопки "За весь год"
         var byYearButton = InlineKeyboardButton.builder()
                 .text(messageService.getMessage("analytics.button.by_year"))
-                .callbackData("analytics_by_year") // Заглушка
+                .callbackData(ANALYTICS_BY_YEAR)
                 .build();
 
         return InlineKeyboardMarkup.builder()

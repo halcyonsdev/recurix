@@ -22,7 +22,7 @@ import java.time.YearMonth;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class AnalyticsCallback implements Callback {
+public class MonthAnalyticsCallback implements Callback {
 
     private final UserService userService;
     private final AnalyticsService analyticsService;

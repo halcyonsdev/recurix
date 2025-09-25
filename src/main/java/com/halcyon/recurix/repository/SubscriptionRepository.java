@@ -20,6 +20,8 @@ public interface SubscriptionRepository extends ReactiveCrudRepository<Subscript
 
     Mono<Integer> countByUserId(Long userId);
 
+    Mono<Integer> countByUserIdAndPaymentDateBetween(Long userId, LocalDate startOfMonth, LocalDate endOfMonth);
+
     Flux<Subscription> findAllByPaymentDateBefore(LocalDate date);
 
     Mono<Subscription> findFirstByUserIdAndPaymentDateBetweenOrderByPriceDesc(Long userId, LocalDate startOfMonth, LocalDate endOfMonth);
@@ -27,7 +29,7 @@ public interface SubscriptionRepository extends ReactiveCrudRepository<Subscript
     Mono<Subscription> findFirstByUserIdAndPaymentDateGreaterThanEqualOrderByPaymentDateAsc(Long userId, LocalDate fromDate);
 
     @Query("""
-        SELECT s.id, s.user_id, s.name, s.price, s.currency,
+        SELECT s.id, s.user_id, s.name, s.price,
             s.payment_date, s.category, s.renewal_months, u.telegram_id
         FROM subscriptions s
         JOIN users u ON s.user_id = u.id

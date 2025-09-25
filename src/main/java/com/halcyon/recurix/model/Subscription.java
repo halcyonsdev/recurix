@@ -28,9 +28,6 @@ public class Subscription {
     @Column("price")
     private BigDecimal price;
 
-    @Column("currency")
-    private String currency;
-
     @Column("payment_date")
     private LocalDate paymentDate;
 

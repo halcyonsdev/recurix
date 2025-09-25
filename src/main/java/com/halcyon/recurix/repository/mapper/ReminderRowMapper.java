@@ -20,7 +20,6 @@ public class ReminderRowMapper implements Converter<Row, ReminderDto> {
                 row.get("user_id", Long.class),
                 row.get("name", String.class),
                 row.get("price", BigDecimal.class),
-                row.get("currency", String.class),
                 row.get("payment_date", LocalDate.class),
                 row.get("category", String.class),
                 row.get("renewal_months", Integer.class),

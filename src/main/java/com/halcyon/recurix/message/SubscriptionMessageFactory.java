@@ -50,7 +50,6 @@ public class SubscriptionMessageFactory {
                 subscription.getName(),
                 subscription.getPrice(),
                 subscription.getPaymentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-                subscription.getCurrency(),
                 subscription.getCategory(),
                 periodFormatter.format(subscription.getRenewalMonths()));
 
@@ -105,7 +104,6 @@ public class SubscriptionMessageFactory {
                         "subscriptions.list.item",
                         subscription.getName(),
                         subscription.getPrice(),
-                        subscription.getCurrency(),
                         subscription.getPaymentDate().format(DATE_FORMATTER),
                         "/view_" + payloadEncoder.encode(subscription.getId(), page.currentPage(), messageId)))
                 .collect(Collectors.joining("\n\n"));
@@ -128,7 +126,6 @@ public class SubscriptionMessageFactory {
                 "subscription.detail.header",
                 subscription.getName(),
                 subscription.getPrice(),
-                subscription.getCurrency(),
                 subscription.getPaymentDate().format(DATE_FORMATTER),
                 subscription.getCategory(),
                 periodFormatter.format(subscription.getRenewalMonths()));

@@ -116,7 +116,6 @@ public abstract class BaseEditStepHandler<T> implements ConversationStepHandler 
                 subscription.getName(),
                 subscription.getPrice(),
                 subscription.getPaymentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-                subscription.getCurrency(),
                 subscription.getCategory(),
                 periodFormatter.format(subscription.getRenewalMonths()));
 

@@ -73,7 +73,6 @@ public class ReminderService {
                 "reminder.message",
                 reminderDto.name(),
                 reminderDto.price(),
-                reminderDto.currency(),
                 viewCommand
         );
 

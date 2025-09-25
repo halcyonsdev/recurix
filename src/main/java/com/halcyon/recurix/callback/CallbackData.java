@@ -19,7 +19,6 @@ public final class CallbackData {
     public static final String EDIT_NAME = "name_edit";
     public static final String EDIT_PRICE = "price_edit";
     public static final String EDIT_DATE = "date_edit";
-    public static final String EDIT_CURRENCY = "currency_edit";
     public static final String EDIT_CATEGORY = "category_edit";
     public static final String EDIT_PERIOD = "period_edit";
     public static final String PERIOD_SELECT_PREFIX = "sub_period_";
@@ -27,7 +26,6 @@ public final class CallbackData {
     public static final String BACK_TO_CONFIRMATION = "back_to_confirmation";
 
     public static final String BACK_TO_EDIT = "back-to-edit";
-    public static final String CURRENCY_SELECT_PREFIX = "sub_currency_";
 
     public static final String CALENDAR_NAV_PREFIX = "cal_nav_";
     public static final String CALENDAR_SELECT_PREFIX = "cal_date_";
@@ -52,4 +50,5 @@ public final class CallbackData {
     public static final String SETTINGS_CHANGE_DAYS_PREFIX = "change_days_";
 
     public static final String ANALYTICS_NAV_PREFIX = "analytics_nav_";
+    public static final String ANALYTICS_BY_YEAR = "analytics_by_year";
 }
